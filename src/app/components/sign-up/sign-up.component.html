@@ -1,0 +1,147 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+  <mat-card class="w-full max-w-2xl p-6 rounded-lg shadow-lg bg-white">
+    <h2 class="text-center text-2xl font-semibold text-gray-800 mb-6">
+      Sign Up
+    </h2>
+
+    <form
+      [formGroup]="signUpForm"
+      (ngSubmit)="onSubmit()"
+      class="flex flex-col gap-6"
+    >
+      <!-- Row 1: User ID & Email -->
+      <div class="flex flex-wrap gap-4">
+        <mat-form-field appearance="outline" class="flex-1 min-w-[200px]">
+          <mat-label>User ID</mat-label>
+          <input matInput formControlName="userId" />
+          <mat-error
+            *ngIf="f['userId'].touched && f['userId'].hasError('required')"
+          >
+            User ID is required.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-1 min-w-[200px]">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          <mat-error
+            *ngIf="f['email'].touched && f['email'].hasError('required')"
+          >
+            Email is required.
+          </mat-error>
+          <mat-error *ngIf="f['email'].touched && f['email'].hasError('email')">
+            Enter a valid email.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Row 2: First Name & Last Name -->
+      <div class="flex flex-wrap gap-4">
+        <mat-form-field appearance="outline" class="flex-1 min-w-[200px]">
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" />
+          <mat-error
+            *ngIf="
+              f['firstName'].touched && f['firstName'].hasError('required')
+            "
+          >
+            First name is required.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-1 min-w-[200px]">
+          <mat-label>Last Name</mat-label>
+          <input matInput formControlName="lastName" />
+          <mat-error
+            *ngIf="f['lastName'].touched && f['lastName'].hasError('required')"
+          >
+            Last name is required.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Row 3: Password & Confirm Password -->
+      <div class="flex flex-wrap gap-4">
+        <mat-form-field appearance="outline" class="flex-1 min-w-[200px]">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePassword('password')"
+          >
+            <mat-icon>{{
+              showPassword ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+          <mat-error
+            *ngIf="f['password'].touched && f['password'].hasError('required')"
+          >
+            Password is required.
+          </mat-error>
+          <mat-error
+            *ngIf="f['password'].hasError('minlength') && f['password'].touched"
+          >
+            Password must be at least 6 characters.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-1 min-w-[200px]">
+          <mat-label>Confirm Password</mat-label>
+          <input
+            matInput
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePassword('confirm')"
+          >
+            <mat-icon>{{
+              showConfirmPassword ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+          <mat-error
+            *ngIf="
+              f['confirmPassword'].touched &&
+              f['confirmPassword'].hasError('required')
+            "
+          >
+            Confirm Password is required.
+          </mat-error>
+          <!-- ✅ New Error Message for Password Mismatch -->
+          <mat-error
+            *ngIf="
+      f['confirmPassword'].touched &&
+      f['confirmPassword'].errors?.['mismatch']
+    "
+          >
+            Passwords do not match.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Submit Button -->
+      <button mat-raised-button color="primary" class="w-full" type="submit">
+        Create Account
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Already have an account?
+      <a
+        routerLink="/sign-in"
+        class="text-blue-600 font-medium hover:underline"
+      >
+        Sign In
+      </a>
+    </p>
+  </mat-card>
+</div>

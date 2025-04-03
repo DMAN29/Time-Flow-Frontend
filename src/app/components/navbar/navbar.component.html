@@ -1,0 +1,79 @@
+<nav class="bg-white shadow-xl px-4 py-3 flex items-center justify-between">
+  <!-- Left: Logo & Company -->
+  <div class="flex items-center gap-2">
+    <img
+      src="https://img.freepik.com/premium-vector/heauty-hand-drawn-clothing-store-logo-boutique_637057-218.jpg?semt=ais_hybrid"
+      alt="Logo"
+      class="h-8 w-auto"
+    />
+    <span class="text-xl font-bold text-gray-800">LineDesign</span>
+  </div>
+
+  <!-- Hamburger Icon (only on small screens) -->
+  <button
+    class="md:hidden text-gray-700"
+    (click)="toggleMenu()"
+    aria-label="Toggle menu"
+  >
+    <mat-icon>{{ menuOpen ? "close" : "menu" }}</mat-icon>
+  </button>
+
+  <!-- Center: Navigation Links (hidden on small screens) -->
+  <div class="hidden md:flex gap-6">
+    <a
+      routerLink="/add-order"
+      class="text-gray-700 hover:text-blue-600 font-medium"
+      >Add New Order</a
+    >
+    <a
+      routerLink="/orders"
+      class="text-gray-700 hover:text-blue-600 font-medium"
+      >Existing Orders</a
+    >
+    <a
+      *ngIf="isAdmin"
+      routerLink="/users"
+      class="text-gray-700 hover:text-blue-600 font-medium"
+      >Registered Users</a
+    >
+  </div>
+
+  <!-- Right: Profile (hidden on small screens) -->
+  <div class="hidden md:flex items-center gap-2">
+    <span class="text-gray-600 text-sm">Hello, {{ user?.firstName }}</span>
+    <mat-icon>account_circle</mat-icon>
+  </div>
+</nav>
+
+<!-- Mobile Menu Dropdown -->
+<div
+  *ngIf="menuOpen"
+  class="md:hidden bg-white border-t shadow px-4 py-3 space-y-4"
+>
+  <!-- Center links -->
+  <a
+    routerLink="/add-order"
+    class="block text-gray-700 hover:text-blue-600 font-medium"
+    >Add New Order</a
+  >
+  <a
+    routerLink="/orders"
+    class="block text-gray-700 hover:text-blue-600 font-medium"
+    >Existing Orders</a
+  >
+  <a
+    *ngIf="isAdmin"
+    routerLink="/users"
+    class="block text-gray-700 hover:text-blue-600 font-medium"
+    >Registered Users</a
+  >
+
+  <!-- Divider -->
+  <hr />
+
+  <!-- Profile at bottom -->
+  <div class="flex items-center justify-between">
+    <span class="text-gray-600 text-sm">Hello, {{ user?.firstName }}</span>
+    <mat-icon>account_circle</mat-icon>
+  </div>
+</div>

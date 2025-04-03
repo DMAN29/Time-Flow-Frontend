@@ -1,0 +1,82 @@
+<div class="flex justify-center">
+  <form
+    [formGroup]="orderForm"
+    (ngSubmit)="onSubmit()"
+    class="w-[90%] lg:w-[75%] p-6 space-y-6 shadow-2xl mt-5 lg:mt-16"
+  >
+    <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center">
+      Create New Order
+    </h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Row 1 -->
+      <mat-form-field appearance="outline">
+        <mat-label>Style No</mat-label>
+        <input matInput formControlName="styleNo" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Item No</mat-label>
+        <input matInput formControlName="itemNo" />
+      </mat-form-field>
+
+      <!-- Row 2 -->
+      <mat-form-field appearance="outline">
+        <mat-label>Fabric</mat-label>
+        <input matInput formControlName="fabric" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Division</mat-label>
+        <input matInput formControlName="division" />
+      </mat-form-field>
+
+      <!-- Row 3 -->
+      <mat-form-field appearance="outline">
+        <mat-label>Buyer</mat-label>
+        <input matInput formControlName="buyer" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="row-span-2">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="4"></textarea>
+      </mat-form-field>
+
+      <!-- Row 4 -->
+      <mat-form-field appearance="outline">
+        <mat-label>Order Quantity</mat-label>
+        <input
+          matInput
+          type="text"
+          [value]="formatNumber(orderForm.value.orderQuantity)"
+          (input)="updateNumber('orderQuantity', $event)"
+        />
+      </mat-form-field>
+
+      <!-- Row 5 -->
+      <mat-form-field appearance="outline">
+        <mat-label>Target</mat-label>
+        <input
+          matInput
+          type="text"
+          [value]="formatNumber(orderForm.value.target)"
+          (input)="updateNumber('target', $event)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Efficiency (%)</mat-label>
+        <input
+          matInput
+          type="text"
+          [value]="formatNumber(orderForm.value.efficiency)"
+          (input)="updateNumber('efficiency', $event)"
+        />
+      </mat-form-field>
+    </div>
+
+    <button mat-raised-button color="primary" class="w-full mt-6" type="submit">
+      Submit Order
+    </button>
+  </form>
+</div>
