@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home.component';
 import { NewOrderComponent } from './components/new-order/new-order.component';
 import { ExistingOrderComponent } from './components/existing-order/existing-order.component';
 import { UsersListComponent } from './components/users-list/users-list.component';
+import { OrderDetailsComponent } from './components/order-details/order-details.component';
 
 export const routes: Routes = [
   {
@@ -30,5 +31,9 @@ export const routes: Routes = [
   {
     path: 'users',
     component: UsersListComponent,
+  },
+  {
+    path: 'order/:styleNo',
+    component: OrderDetailsComponent,
   },
 ];

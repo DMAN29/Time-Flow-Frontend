@@ -1,1 +1,94 @@
-<p>existing-order works!</p>
+<div class="p-6 lg:w-[80%] mx-auto">
+  <h2 class="text-2xl font-semibold mb-4 text-gray-800">Existing Orders</h2>
+
+  <div class="overflow-auto rounded shadow-md">
+    <table
+      mat-table
+      [dataSource]="orders"
+      class="mat-elevation-z8 min-w-[1000px] w-full"
+    >
+      <!-- S.No -->
+      <ng-container matColumnDef="sno">
+        <th mat-header-cell *matHeaderCellDef>S.No</th>
+        <td mat-cell *matCellDef="let order; let i = index">{{ i + 1 }}</td>
+      </ng-container>
+
+      <!-- Style No -->
+      <ng-container matColumnDef="styleNo">
+        <th mat-header-cell *matHeaderCellDef>Style No</th>
+        <td mat-cell *matCellDef="let order">{{ order.styleNo }}</td>
+      </ng-container>
+
+      <!-- Item No -->
+      <ng-container matColumnDef="itemNo">
+        <th mat-header-cell *matHeaderCellDef>Item No</th>
+        <td mat-cell *matCellDef="let order">{{ order.itemNo }}</td>
+      </ng-container>
+
+      <!-- Buyer -->
+      <ng-container matColumnDef="buyer">
+        <th mat-header-cell *matHeaderCellDef>Buyer</th>
+        <td mat-cell *matCellDef="let order">{{ order.buyer }}</td>
+      </ng-container>
+
+      <!-- Order Quantity -->
+      <ng-container matColumnDef="orderQuantity">
+        <th mat-header-cell *matHeaderCellDef>Order Qty</th>
+        <td mat-cell *matCellDef="let order">
+          {{ order.orderQuantity | number }}
+        </td>
+      </ng-container>
+
+      <!-- Target -->
+      <ng-container matColumnDef="target">
+        <th mat-header-cell *matHeaderCellDef>Target</th>
+        <td mat-cell *matCellDef="let order">{{ order.target }}</td>
+      </ng-container>
+
+      <!-- Efficiency -->
+      <ng-container matColumnDef="efficiency">
+        <th mat-header-cell *matHeaderCellDef>Efficiency</th>
+        <td mat-cell *matCellDef="let order">{{ order.efficiency }}%</td>
+      </ng-container>
+
+      <!-- Designed Output -->
+      <ng-container matColumnDef="designOutput">
+        <th mat-header-cell *matHeaderCellDef>Designed Op</th>
+        <td mat-cell *matCellDef="let order">{{ order.designOutput }}</td>
+      </ng-container>
+
+      <!-- Allowance -->
+      <ng-container matColumnDef="allowance">
+        <th mat-header-cell *matHeaderCellDef>Allowance</th>
+        <td mat-cell *matCellDef="let order">{{ order.allowance }}%</td>
+      </ng-container>
+
+      <!-- Lane -->
+      <ng-container matColumnDef="lane">
+        <th mat-header-cell *matHeaderCellDef>Lane</th>
+        <td mat-cell *matCellDef="let order">{{ order.lane }}</td>
+      </ng-container>
+
+      <!-- Line Design -->
+      <ng-container matColumnDef="lineDesign">
+        <th mat-header-cell *matHeaderCellDef>Lane Design</th>
+        <td mat-cell *matCellDef="let order">{{ order.lineDesign }}%</td>
+      </ng-container>
+
+      <!-- Created By -->
+      <ng-container matColumnDef="createdBy">
+        <th mat-header-cell *matHeaderCellDef>Created By</th>
+        <td mat-cell *matCellDef="let order">{{ order.createdBy }}</td>
+      </ng-container>
+
+      <!-- Table Headers and Rows -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        class="cursor-pointer hover:bg-gray-100"
+        (click)="goToOrderDetails(row.styleNo)"
+      ></tr>
+    </table>
+  </div>
+</div>

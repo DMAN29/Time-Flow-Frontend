@@ -1,0 +1,80 @@
+<!-- order-details.component.html -->
+<div class="p-6 space-y-6 lg:w-[90%] mx-auto">
+  <!-- Order Details Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div><strong>Style No:</strong> {{ order?.styleNo }}</div>
+    <div><strong>Item No:</strong> {{ order?.itemNo }}</div>
+    <div><strong>Description:</strong> {{ order?.description }}</div>
+    <div><strong>Fabric:</strong> {{ order?.fabric }}</div>
+    <div><strong>Division:</strong> {{ order?.division }}</div>
+    <div><strong>Buyer:</strong> {{ order?.buyer }}</div>
+    <div>
+      <strong>Order Quantity:</strong> {{ order?.orderQuantity | number }}
+    </div>
+    <div><strong>Target:</strong> {{ order?.target }}</div>
+    <div><strong>Efficiency:</strong> {{ order?.efficiency }}%</div>
+    <div><strong>Design Output:</strong> {{ order?.designOutput }}</div>
+    <div><strong>Line Design:</strong> {{ order?.lineDesign }}</div>
+    <div><strong>Allowance:</strong> {{ order?.allowance }}%</div>
+    <div><strong>Lane:</strong> {{ order?.lane }}</div>
+    <div><strong>Created By:</strong> {{ order?.createdBy || "N/A" }}</div>
+  </div>
+
+  <!-- Operations Table -->
+  <div class="overflow-auto rounded shadow-md">
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      class="mat-elevation-z8 w-full min-w-[900px]"
+    >
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let op">{{ op.id ?? "" }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="operationName">
+        <th mat-header-cell *matHeaderCellDef>Operation</th>
+        <td
+          mat-cell
+          *matCellDef="let op"
+          [ngClass]="{ 'font-semibold': op.operationName === 'Total' }"
+        >
+          {{ op.operationName }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="section">
+        <th mat-header-cell *matHeaderCellDef>Section</th>
+        <td mat-cell *matCellDef="let op">{{ op.section }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="sam">
+        <th mat-header-cell *matHeaderCellDef>SAM</th>
+        <td mat-cell *matCellDef="let op">{{ op.sam }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="machineType">
+        <th mat-header-cell *matHeaderCellDef>Machine</th>
+        <td mat-cell *matCellDef="let op">{{ op.machineType }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="required">
+        <th mat-header-cell *matHeaderCellDef>Required</th>
+        <td mat-cell *matCellDef="let op">{{ op.required }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="allocated">
+        <th mat-header-cell *matHeaderCellDef>Allocated</th>
+        <td mat-cell *matCellDef="let op">{{ op.allocated }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="target">
+        <th mat-header-cell *matHeaderCellDef>Target</th>
+        <td mat-cell *matCellDef="let op">{{ op.target }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>

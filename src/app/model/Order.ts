@@ -18,6 +18,7 @@ export interface Order {
   createdAt: string;
   allowance: number;
   lane: number;
+  createdBy: string;
 }
 
 export interface LaneRequest {
