@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BASE_URL, getAuthHeaders } from './base-url';
-import { LapsRequest, RemarkRequest, TimeStudy } from '../model/TimeStudy';
+import { LapsRequest, TimeStudy } from '../model/TimeStudy';
 import { ApiResponse } from '../model/ApiResponse';
 
 @Injectable({
@@ -54,10 +54,25 @@ export class TimeStudyService {
   }
 
   // ✅ Update Remarks
-  updateRemarks(remarks: RemarkRequest): Observable<ApiResponse> {
+  updateRemarks(id: string, remark: string): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(
-      `${this.URL}/remarks`,
-      remarks,
+      `${this.URL}/remarks/${id}`,
+      remark,
+      getAuthHeaders()
+    );
+  }
+
+  deleteStudyById(id: string): Observable<any> {
+    return this.http.delete(`${this.URL}/delete/${id}`, getAuthHeaders());
+  }
+
+  updateLapsReading(
+    id: string,
+    study: Partial<TimeStudy>
+  ): Observable<TimeStudy> {
+    return this.http.put<any>(
+      `${this.URL}/update/${id}`,
+      study,
       getAuthHeaders()
     );
   }

@@ -119,7 +119,35 @@
 
             <td class="border px-3 py-2 text-center">{{ row.capacityPH }}</td>
             <td class="border px-3 py-2 text-center">{{ row.capacityPD }}</td>
-            <td class="border px-3 py-2 text-center">{{ row.remarks }}</td>
+            <td class="border px-3 py-2 text-center">
+              <!-- Add Remarks -->
+              <button
+                mat-mini-fab
+                color="accent"
+                matTooltip="Add Remarks"
+                *ngIf="row.operatorId && !row.remarks"
+                (click)="openAddRemarksDialog(row.id)"
+              >
+                <mat-icon>note_add</mat-icon>
+              </button>
+
+              <!-- If remarks exist, show in table -->
+              <span *ngIf="row.remarks" class="text-xs text-blue-600">
+                {{ row.remarks }}
+              </span>
+            </td>
+
+            <!-- <td class="border px-3 py-2 text-center">
+              <span *ngIf="row.remarks">{{ row.remarks }}</span>
+              <button
+                *ngIf="row.operatorId && row.operatorName && !row.remarks"
+                mat-button
+                color="primary"
+                (click)="openAddRemarksDialog(row)"
+              >
+                Add Remarks
+              </button>
+            </td> -->
 
             <td class="border px-3 py-2 text-center">
               <div class="flex gap-2 justify-center items-center">
@@ -148,13 +176,12 @@
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
-
                 <button
                   mat-mini-fab
                   color="warn"
                   matTooltip="Remove Row"
                   *ngIf="group.rows.length > group.initialCount"
-                  (click)="removeRow(group, rIdx)"
+                  (click)="removeRow(group, rIdx, row.id)"
                 >
                   <mat-icon>remove</mat-icon>
                 </button>

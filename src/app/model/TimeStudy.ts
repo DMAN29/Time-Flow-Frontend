@@ -16,12 +16,6 @@ export interface TimeStudy {
   capacityPD: number;
 }
 
-export interface RemarkRequest {
-  operatorId: string;
-  styleNo: string;
-  remark: string;
-}
-
 export interface LapsRequest {
   operatorId: string;
   styleNo: string;

@@ -27,6 +27,7 @@ export class StopWatchComponent implements OnInit {
   isPaused: boolean = false;
   intervalId: any;
   laps: number[] = [];
+  id!: string | null;
 
   constructor(
     private route: ActivatedRoute,
@@ -36,6 +37,7 @@ export class StopWatchComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
+      this.id = params['id'] ?? null;
       this.styleNo = params['styleNo'];
       this.operatorId = params['operatorId'];
       this.operatorName = params['operatorName'];
@@ -125,17 +127,30 @@ export class StopWatchComponent implements OnInit {
       operationName: this.operationName,
       section: this.section,
       machineType: this.machineType,
-      lapsMS: this.getLapDifferences(),
+      lapsMS: this.getLapDifferences(), // ✅ send difference laps
     };
 
-    this.timeStudyService.storeStudy(payload).subscribe({
-      next: (res) => {
-        console.log('✅ Study saved:', res);
-        this.router.navigate(['/time-study', this.styleNo]); // 👈 navigate back
-      },
-      error: (err) => {
-        console.error('❌ Failed to save study', err);
-      },
-    });
+    if (this.id) {
+      (payload as any).id = this.id;
+      console.log('payload (update)', payload);
+      this.timeStudyService.updateLapsReading(this.id, payload).subscribe({
+        next: (res) => {
+          console.log('✅ Study updated:', res);
+          this.router.navigate(['/time-study', this.styleNo]);
+        },
+        error: (err) => console.error('❌ Failed to update study', err),
+      });
+    } else {
+      console.log('payload (new)', payload);
+      this.timeStudyService.storeStudy(payload).subscribe({
+        next: (res) => {
+          console.log('✅ Study saved:', res);
+          this.router.navigate(['/time-study', this.styleNo]);
+        },
+        error: (err) => {
+          console.error('❌ Failed to save study', err);
+        },
+      });
+    }
   }
 }

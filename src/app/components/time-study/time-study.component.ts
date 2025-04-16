@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AddOperatorComponent } from './add-operator/add-operator.component';
+import { AddRemarksComponent } from './add-remarks/add-remarks.component';
 
 @Component({
   selector: 'app-time-study',
@@ -47,6 +48,8 @@ export class TimeStudyComponent implements OnInit {
   tempAllowance: number = 0;
   tempLaps: number = 10;
 
+  studyGroupedMap: Map<string, any[]> = new Map(); // backend study data grouped by operation+section
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -57,58 +60,43 @@ export class TimeStudyComponent implements OnInit {
 
   ngOnInit(): void {
     const styleNo = this.route.snapshot.paramMap.get('styleNo');
-    if (styleNo) {
-      this.orderService.getOrderByStyleNo(styleNo).subscribe({
-        next: (res) => {
-          this.operations = res.operations;
-          this.laneNo = res.lane;
-          this.allowance = res.allowance ?? 0;
-          this.tempAllowance = this.allowance;
-          this.numberOfLaps = res.noOfLaps ?? 10;
-          this.tempLaps = this.numberOfLaps;
+    if (!styleNo) return;
 
-          this.updateLapsHeaders();
-          this.groupOperations(); // ⬅️ First build the table
+    this.orderService.getOrderByStyleNo(styleNo).subscribe({
+      next: (res) => {
+        this.operations = res.operations;
+        this.laneNo = res.lane;
+        this.allowance = res.allowance ?? 0;
+        this.tempAllowance = this.allowance;
+        this.numberOfLaps = res.noOfLaps ?? 10;
+        this.tempLaps = this.numberOfLaps;
 
-          // ⬅️ THEN inject time study into rows
-          this.studyService.getStudyByStyleNo(styleNo).subscribe({
-            next: (studyData) => {
-              this.canEditLaps = studyData.length === 0;
-              console.log(studyData);
-              for (const entry of studyData) {
-                const key = `${entry.operationName}__${entry.section}`;
-                const group = this.groupedOperations.find((g) => g.key === key);
-                if (group && group.rows.length > 0) {
-                  // Find the first empty row in the group to insert into
-                  const targetRow = group.rows.find(
-                    (row) => !row.operatorId && !row.operatorName
-                  );
+        this.updateLapsHeaders();
 
-                  if (targetRow) {
-                    targetRow.operatorId = entry.operatorId;
-                    targetRow.operatorName = entry.operatorName;
-                    targetRow.machineType = entry.machineType;
-                    targetRow.laps =
-                      entry.laps ?? Array(this.numberOfLaps).fill('');
-                    targetRow.avg = entry.avgTime ?? '';
-                    targetRow.allowance = entry.allowanceTime ?? '';
-                    targetRow.capacityPH = entry.capacityPH ?? '';
-                    targetRow.capacityPD = entry.capacityPD ?? '';
-                    targetRow.remarks = entry.remarks ?? '';
-                  } else {
-                    console.warn(
-                      `⚠️ No available row to map for ${entry.operationName} - ${entry.operatorName}`
-                    );
-                  }
-                }
+        // First, get study data
+        this.studyService.getStudyByStyleNo(styleNo).subscribe({
+          next: (studyData) => {
+            this.canEditLaps = studyData.length === 0;
+
+            // Group study data by operation + section
+            for (const entry of studyData) {
+              const key = `${entry.operationName}__${entry.section}`;
+              if (!this.studyGroupedMap.has(key)) {
+                this.studyGroupedMap.set(key, []);
               }
-            },
-            error: () => (this.canEditLaps = true),
-          });
-        },
-        error: (err) => console.error('❌ Order fetch error:', err),
-      });
-    }
+              this.studyGroupedMap.get(key)!.push(entry);
+            }
+
+            this.groupOperations(); // Build table after grouping study data
+          },
+          error: () => {
+            this.canEditLaps = true;
+            this.groupOperations(); // Still build the table
+          },
+        });
+      },
+      error: (err) => console.error('❌ Order fetch error:', err),
+    });
   }
 
   updateLapsHeaders(): void {
@@ -123,34 +111,56 @@ export class TimeStudyComponent implements OnInit {
 
     for (const op of this.operations) {
       const key = `${op.operationName}__${op.section}`;
-      const times = Math.round(op.allocated);
+      const allocatedCount = Math.round(op.allocated);
+      const existingStudies = this.studyGroupedMap.get(key) ?? [];
 
-      const rows = Array.from({ length: times }, () => ({
-        operationName: op.operationName,
-        section: op.section,
-        operatorId: '',
-        operatorName: '',
-        laps: Array(this.numberOfLaps).fill(''),
-        avg: '',
-        allowance: '',
-        capacityPH: '',
-        capacityPD: '',
-        remarks: '',
-        machineType: op.machineType || '',
-      }));
+      const totalRows = Math.max(allocatedCount, existingStudies.length);
 
-      if (groupedMap.has(key)) {
-        groupedMap.get(key)!.push(...rows);
-      } else {
-        groupedMap.set(key, rows);
-      }
+      const rows = Array.from({ length: totalRows }, (_, i) => {
+        const study = existingStudies[i];
+        return study
+          ? {
+              operationName: op.operationName,
+              section: op.section,
+              operatorId: study.operatorId,
+              operatorName: study.operatorName,
+              laps: study.laps ?? Array(this.numberOfLaps).fill(''),
+              avg: study.avgTime ?? '',
+              allowance: study.allowanceTime ?? '',
+              capacityPH: study.capacityPH ?? '',
+              capacityPD: study.capacityPD ?? '',
+              remarks: study.remarks ?? '',
+              machineType: study.machineType ?? op.machineType ?? '',
+              id: study.id, // ⬅️ Backend unique ID
+            }
+          : {
+              operationName: op.operationName,
+              section: op.section,
+              operatorId: '',
+              operatorName: '',
+              laps: Array(this.numberOfLaps).fill(''),
+              avg: '',
+              allowance: '',
+              capacityPH: '',
+              capacityPD: '',
+              remarks: '',
+              machineType: op.machineType ?? '',
+              id: null,
+            };
+      });
+
+      groupedMap.set(key, rows);
     }
 
     this.groupedOperations = Array.from(groupedMap.entries()).map(
       ([key, rows]) => ({
         key,
         rows,
-        initialCount: rows.length,
+        initialCount: Math.round(
+          this.operations.find(
+            (op) => `${op.operationName}__${op.section}` === key
+          )?.allocated ?? 0
+        ),
       })
     );
   }
@@ -179,20 +189,58 @@ export class TimeStudyComponent implements OnInit {
   }
 
   applyAllowance(): void {
-    this.allowance = Math.max(0, Math.min(this.tempAllowance, 100));
-    this.groupedOperations.forEach((group) =>
-      group.rows.forEach((row) => (row.allowance = this.allowance))
-    );
+    const clamped = Math.max(0, Math.min(this.tempAllowance, 100));
+    this.allowance = clamped;
 
     const styleNo = this.route.snapshot.paramMap.get('styleNo');
-    if (styleNo) {
-      this.orderService
-        .updateAllowance({ styleNo, allowance: this.allowance })
-        .subscribe({
-          next: (res) => console.log('✅ Allowance updated:', res.message),
-          error: (err) => console.error('❌ Failed to update allowance', err),
-        });
-    }
+    if (!styleNo) return;
+
+    this.orderService
+      .updateAllowance({ styleNo, allowance: clamped })
+      .subscribe({
+        next: (res) => {
+          console.log('✅ Allowance updated:', res.message);
+
+          // ⬇️ Re-fetch order to get updated allowance & operations
+          this.orderService.getOrderByStyleNo(styleNo).subscribe({
+            next: (res) => {
+              this.operations = res.operations;
+              this.allowance = res.allowance ?? 0; // Update UI label as well
+              this.laneNo = res.lane;
+              this.numberOfLaps = res.noOfLaps ?? 10;
+              this.tempLaps = this.numberOfLaps;
+
+              this.updateLapsHeaders();
+
+              // Then re-fetch time study
+              this.studyService.getStudyByStyleNo(styleNo).subscribe({
+                next: (studyData) => {
+                  this.studyGroupedMap.clear();
+                  for (const entry of studyData) {
+                    const key = `${entry.operationName}__${entry.section}`;
+                    if (!this.studyGroupedMap.has(key)) {
+                      this.studyGroupedMap.set(key, []);
+                    }
+                    this.studyGroupedMap.get(key)!.push(entry);
+                  }
+
+                  this.groupOperations(); // 🔁 Rebuild table
+                },
+                error: (err) =>
+                  console.error(
+                    '❌ Failed to reload study after allowance',
+                    err
+                  ),
+              });
+            },
+            error: (err) =>
+              console.error('❌ Failed to reload order after allowance', err),
+          });
+        },
+        error: (err) => {
+          console.error('❌ Failed to update allowance', err);
+        },
+      });
   }
 
   addDuplicate(group: { rows: any[] }): void {
@@ -209,11 +257,26 @@ export class TimeStudyComponent implements OnInit {
       capacityPD: '',
       remarks: '',
       machineType: ref.machineType,
+      id: null,
     });
   }
 
-  removeRow(group: { rows: any[]; initialCount: number }, rIdx: number): void {
-    if (group.rows.length > group.initialCount) group.rows.splice(rIdx, 1);
+  removeRow(
+    group: { rows: any[]; initialCount: number },
+    rIdx: number,
+    rowId: string | null
+  ): void {
+    if (group.rows.length > group.initialCount) {
+      // Optionally delete from backend if the row was saved
+      if (rowId) {
+        this.studyService.deleteStudyById(rowId).subscribe({
+          next: () => console.log('✅ Row deleted from backend'),
+          error: (err) => console.error('❌ Backend delete failed', err),
+        });
+        console.log(rowId);
+      }
+      group.rows.splice(rIdx, 1);
+    }
   }
 
   openAddDataDialog(
@@ -248,6 +311,7 @@ export class TimeStudyComponent implements OnInit {
     const styleNo = this.route.snapshot.paramMap.get('styleNo');
     this.router.navigate(['/stop-watch'], {
       queryParams: {
+        id: row.id, // ⬅️ Pass id to detect update mode
         styleNo,
         operatorName: row.operatorName,
         operatorId: row.operatorId,
@@ -256,6 +320,48 @@ export class TimeStudyComponent implements OnInit {
         machineType: row.machineType,
         noOfLaps: this.numberOfLaps,
       },
+    });
+  }
+  openAddRemarksDialog(row: any): void {
+    const dialogRef = this.dialog.open(AddRemarksComponent, {
+      width: '400px',
+      data: { operatorName: row.operatorName },
+    });
+
+    dialogRef.afterClosed().subscribe((remark: string) => {
+      if (remark && row.id) {
+        this.studyService.updateRemarks(row.id, remark).subscribe({
+          next: () => {
+            const styleNo = this.route.snapshot.paramMap.get('styleNo');
+            if (!styleNo) return;
+
+            // Option 1: Refresh only that row (basic version)
+            this.studyService.getStudyByStyleNo(styleNo).subscribe({
+              next: (studyData) => {
+                const updatedRow = studyData.find((r) => r.id === row.id);
+                if (!updatedRow) return;
+
+                const key = `${updatedRow.operationName}__${updatedRow.section}`;
+                const group = this.groupedOperations.find((g) => g.key === key);
+                if (!group) return;
+
+                const rowIndex = group.rows.findIndex((r) => r.id === row.id);
+                if (rowIndex >= 0) {
+                  group.rows[rowIndex] = {
+                    ...group.rows[rowIndex],
+                    remarks: updatedRow.remarks,
+                  };
+                }
+              },
+              error: (err) =>
+                console.error('❌ Failed to fetch updated row data', err),
+            });
+          },
+          error: (err) => {
+            console.error('❌ Failed to update remarks', err);
+          },
+        });
+      }
     });
   }
 }

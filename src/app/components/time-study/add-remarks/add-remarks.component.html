@@ -1,0 +1,20 @@
+<h2 mat-dialog-title class="text-lg font-semibold mb-4">
+  Add Remarks for {{ data.operationName }} ({{ data.section }})
+</h2>
+
+<mat-form-field appearance="outline" class="w-full">
+  <mat-label>Remarks</mat-label>
+  <input matInput [(ngModel)]="remarks" />
+</mat-form-field>
+
+<div class="mt-4 flex justify-end gap-4">
+  <button mat-stroked-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="!remarks.trim()"
+  >
+    Submit
+  </button>
+</div>
