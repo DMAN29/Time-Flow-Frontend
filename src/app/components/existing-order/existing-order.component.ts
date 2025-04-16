@@ -5,14 +5,29 @@ import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
+import { MatButton } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-existing-order',
-  imports: [CommonModule, MatTableModule, MatProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatProgressSpinnerModule,
+    MatButton,
+    MatLabel,
+    FormsModule,
+    MatFormField,
+    MatInput,
+  ],
   templateUrl: './existing-order.component.html',
 })
 export class ExistingOrderComponent implements OnInit {
   orders: Order[] = [];
+  filteredOrders: Order[] = [];
+  searchText: string = '';
   displayedColumns: string[] = [
     'sno',
     'styleNo',
@@ -22,31 +37,42 @@ export class ExistingOrderComponent implements OnInit {
     'target',
     'efficiency',
     'designOutput',
-    'allowance',
+    // 'allowance',
     'lane',
     'lineDesign',
-    'createdBy',
+    'view',
+    'timeStudy',
   ];
 
   constructor(private orderService: OrderService, private router: Router) {}
 
   ngOnInit(): void {
     this.orderService.getAllOrders().subscribe({
-      next: (res) => {
-        this.orders = res;
-        console.log('Orders loaded:', this.orders);
+      next: (data) => {
+        this.orders = data;
+        this.filteredOrders = data;
       },
-      error: (err) => {
-        console.error('Failed to load orders:', err);
-      },
+      error: (err) => console.error('Error loading orders', err),
     });
   }
 
-  get dataSource() {
-    return this.orders;
+  applyFilter(): void {
+    const value = this.searchText.trim().toLowerCase();
+    if (!value) {
+      // If input is empty, show all
+      this.filteredOrders = this.orders;
+    } else {
+      // Filter by styleNo
+      this.filteredOrders = this.orders.filter((order) =>
+        order.styleNo.toLowerCase().includes(value)
+      );
+    }
   }
 
   goToOrderDetails(styleNo: string) {
     this.router.navigate(['/order', styleNo]);
+  }
+  goToTimeStudy(styleNo: string) {
+    this.router.navigate(['/time-study', styleNo]);
   }
 }

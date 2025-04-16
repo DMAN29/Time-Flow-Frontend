@@ -6,6 +6,7 @@ export interface TimeStudy {
   operationName: string;
   section: string;
   machineType: string;
+  lapsCount: number;
   laps: string[];
   lapsMS: number[];
   avgTime: string;

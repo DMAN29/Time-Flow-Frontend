@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BASE_URL, getAuthHeaders } from './base-url';
-import { AllowanceRequest, LaneRequest, Order } from '../model/Order';
+import {
+  AllowanceRequest,
+  LaneRequest,
+  LapsCountRequest,
+  Order,
+} from '../model/Order';
 import { ApiResponse } from '../model/ApiResponse';
 
 @Injectable({
@@ -15,6 +20,8 @@ export class OrderService {
 
   // Create Order
   createOrder(order: any): Observable<Order> {
+    console.log('Creating order:', order); // 👈 console log here
+
     return this.http.post<Order>(`${this.URL}`, order, getAuthHeaders());
   }
 
@@ -59,6 +66,14 @@ export class OrderService {
       `${this.URL}/lane`,
       lane,
       getAuthHeaders()
+    );
+  }
+
+  updateLapsCount(lap: LapsCountRequest): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(
+      `${this.URL}/laps`,
+      lap,
+      getAuthHeaders() // or just `{ headers: ... }`
     );
   }
 }

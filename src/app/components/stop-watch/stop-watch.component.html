@@ -1,0 +1,85 @@
+<div class="p-6 text-center">
+  <h2 class="text-2xl font-semibold mb-4">Stopwatch</h2>
+
+  <!-- Timer Display -->
+  <div class="text-5xl font-mono mb-6">
+    {{ format(time) }}
+  </div>
+
+  <!-- Start Button -->
+  <div *ngIf="!running && time === 0 && laps.length === 0">
+    <button mat-raised-button color="primary" (click)="start()">
+      <mat-icon class="mr-1">play_arrow</mat-icon>
+      Start
+    </button>
+  </div>
+
+  <!-- Control Buttons -->
+  <div
+    class="flex justify-center gap-4 flex-wrap"
+    *ngIf="!showSubmitSection && time > 0"
+  >
+    <button
+      mat-fab
+      [color]="running ? 'warn' : 'primary'"
+      (click)="togglePauseResume()"
+    >
+      <mat-icon>{{ running ? "pause" : "play_arrow" }}</mat-icon>
+    </button>
+
+    <button
+      mat-fab
+      color="accent"
+      (click)="flag()"
+      [disabled]="!running"
+      matTooltip="You can only flag while stopwatch is running"
+    >
+      <mat-icon>flag</mat-icon>
+    </button>
+
+    <button mat-fab color="warn" (click)="reset()">
+      <mat-icon>replay</mat-icon>
+    </button>
+  </div>
+
+  <!-- Lap Table -->
+  <div *ngIf="laps.length > 0" class="mt-6 max-w-md mx-auto">
+    <h3 class="text-lg font-semibold mb-3 text-blue-700">
+      Laps ({{ laps.length }}/{{ noOfLaps }})
+    </h3>
+
+    <table
+      class="min-w-full border text-sm text-left border-collapse shadow-md"
+    >
+      <thead class="bg-gray-200 text-gray-700">
+        <tr>
+          <th class="border px-3 py-1 text-center">Lap No.</th>
+          <th class="border px-3 py-1 text-center">Recorded Time</th>
+          <th class="border px-3 py-1 text-center">Time Since Previous Lap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lap of laps; let i = index" class="hover:bg-gray-50">
+          <td class="border px-3 py-1 text-center">{{ i + 1 }}</td>
+          <td class="border px-3 py-1 text-center">{{ format(lap) }}</td>
+          <td class="border px-3 py-1 text-center">
+            {{ getLapDifference(i) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Submit and Final Reset -->
+  <div *ngIf="showSubmitSection" class="mt-6 flex justify-center gap-4">
+    <button mat-raised-button color="primary" (click)="onSubmitLaps()">
+      <mat-icon class="mr-1">send</mat-icon>
+      Submit
+    </button>
+
+    <button mat-stroked-button color="warn" (click)="reset()">
+      <mat-icon class="mr-1">restart_alt</mat-icon>
+      Reset
+    </button>
+  </div>
+</div>

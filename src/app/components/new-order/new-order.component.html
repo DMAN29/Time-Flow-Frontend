@@ -127,7 +127,7 @@
           Efficiency must be between 1 and 100.
         </mat-error>
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <!-- <mat-form-field appearance="outline">
         <mat-label>Allowance (%)</mat-label>
         <input
           matInput
@@ -148,11 +148,11 @@
         >
           Allowance must be between 0 and 100.
         </mat-error>
-      </mat-form-field>
+      </mat-form-field> -->
 
       <mat-form-field appearance="outline">
         <mat-label>Line No</mat-label>
-        <input matInput formControlName="line" />
+        <input matInput type="number" formControlName="line" />
         <mat-error *ngIf="f['line'].hasError('required') && f['line'].touched">
           Line number is required.
         </mat-error>

@@ -1,0 +1,168 @@
+<!-- Outer container for spacing -->
+<div class="p-4 md:px-12 max-w-full overflow-x-auto">
+  <!-- Header -->
+  <div class="text-2xl font-bold text-center mb-6">
+    TIME STUDY (Line - {{ laneNo }})
+  </div>
+
+  <!-- Material Inputs and Buttons -->
+  <div class="flex flex-wrap justify-center gap-6 mb-8">
+    <!-- Allowance -->
+    <mat-form-field appearance="outline" class="w-48">
+      <mat-label>Allowance (%)</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="tempAllowance"
+        min="0"
+        max="100"
+      />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="applyAllowance()">
+      Apply Allowance
+    </button>
+
+    <!-- Number of Laps -->
+    <mat-form-field appearance="outline" class="w-48">
+      <mat-label>Number of Laps</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="tempLaps"
+        min="1"
+        max="30"
+        [disabled]="!canEditLaps"
+        required
+      />
+      <mat-error *ngIf="tempLaps < 1 || tempLaps > 30">
+        Value must be between 1 and 30
+      </mat-error>
+    </mat-form-field>
+    <button
+      mat-raised-button
+      color="accent"
+      (click)="applyLaps()"
+      [disabled]="
+        !canEditLaps ||
+        tempLaps < 1 ||
+        tempLaps > 30 ||
+        tempLaps === null ||
+        tempLaps === undefined
+      "
+    >
+      Apply Laps
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full border border-gray-300 text-sm">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="border px-3 py-2">S.No</th>
+          <th class="border px-3 py-2">Operation Name</th>
+          <th class="border px-3 py-2">Section</th>
+          <th class="border px-3 py-2">Operator ID</th>
+          <th class="border px-3 py-2">Operator Name</th>
+          <th class="border px-3 py-2" *ngFor="let lap of lapsHeaders">
+            {{ lap }}
+          </th>
+          <th class="border px-3 py-2">Avg</th>
+          <th class="border px-3 py-2">Allowance {{ allowance }}%</th>
+          <th class="border px-3 py-2">Cap/Hr</th>
+          <th class="border px-3 py-2">Cap/Day</th>
+          <th class="border px-3 py-2">Remarks</th>
+          <th class="border px-3 py-2">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngFor="let group of groupedOperations">
+          <tr
+            *ngFor="let row of group.rows; let rIdx = index"
+            class="hover:bg-gray-50"
+          >
+            <td
+              class="border px-3 py-2 text-center align-top"
+              *ngIf="rIdx === 0"
+              [attr.rowspan]="group.rows.length"
+            >
+              {{ groupedOperations.indexOf(group) + 1 }}
+              <button
+                (click)="addDuplicate(group)"
+                class="ml-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 leading-5"
+                title="Add Row"
+              >
+                +
+              </button>
+            </td>
+
+            <ng-container *ngIf="rIdx !== 0"></ng-container>
+
+            <td class="border px-3 py-2">
+              {{ row.operationName }}
+            </td>
+            <td class="border px-3 py-2 text-center">{{ row.section }}</td>
+            <td class="border px-3 py-2 text-center">{{ row.operatorId }}</td>
+            <td class="border px-3 py-2 text-center">{{ row.operatorName }}</td>
+
+            <td *ngFor="let lap of row.laps" class="border px-3 py-2">
+              {{ lap }}
+            </td>
+
+            <td class="border px-3 py-2">{{ row.avg }}</td>
+
+            <!-- No allowance per row anymore -->
+            <td class="border px-3 py-2 text-center">
+              {{ row.allowance }}
+            </td>
+
+            <td class="border px-3 py-2 text-center">{{ row.capacityPH }}</td>
+            <td class="border px-3 py-2 text-center">{{ row.capacityPD }}</td>
+            <td class="border px-3 py-2 text-center">{{ row.remarks }}</td>
+
+            <td class="border px-3 py-2 text-center">
+              <div class="flex gap-2 justify-center items-center">
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  matTooltip="Add Operator Data"
+                  *ngIf="!row.operatorId && !row.operatorName"
+                  (click)="
+                    openAddDataDialog(
+                      row.operationName,
+                      row.section,
+                      row.machineType
+                    )
+                  "
+                >
+                  <mat-icon>person_add</mat-icon>
+                </button>
+
+                <button
+                  mat-mini-fab
+                  color="accent"
+                  matTooltip="Update Operator Data"
+                  *ngIf="row.operatorId && row.operatorName"
+                  (click)="goToStopwatch(row)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button
+                  mat-mini-fab
+                  color="warn"
+                  matTooltip="Remove Row"
+                  *ngIf="group.rows.length > group.initialCount"
+                  (click)="removeRow(group, rIdx)"
+                >
+                  <mat-icon>remove</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>

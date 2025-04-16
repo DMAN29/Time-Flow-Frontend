@@ -1,20 +1,38 @@
 <div class="p-6 lg:w-[80%] mx-auto overflow-x-auto">
-  <h2 class="text-xl font-semibold mb-4 text-gray-800">Registered Users</h2>
+  <!-- Header with Search -->
+  <div
+    class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4"
+  >
+    <h2 class="text-xl font-semibold text-gray-800">Registered Users</h2>
 
+    <mat-form-field appearance="outline" class="w-full sm:w-64">
+      <mat-label>Search by Name</mat-label>
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="filterValue"
+        (input)="applyFilter()"
+        placeholder="e.g. John Doe"
+      />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Users Table -->
   <table
     mat-table
-    [dataSource]="users"
+    [dataSource]="filteredUsers"
     class="mat-elevation-z8 w-full min-w-[800px]"
   >
     <!-- Serial Number -->
-    <ng-container matColumnDef="serial">
-      <th mat-header-cell *matHeaderCellDef>#</th>
+    <ng-container matColumnDef="S.No">
+      <th mat-header-cell *matHeaderCellDef>S.No</th>
       <td mat-cell *matCellDef="let user; let i = index">{{ i + 1 }}</td>
     </ng-container>
 
     <!-- User Name -->
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>User Name</th>
+      <th mat-header-cell *matHeaderCellDef>Name</th>
       <td mat-cell *matCellDef="let user">
         {{ user.firstName }} {{ user.lastName }}
       </td>
@@ -36,10 +54,7 @@
     <ng-container matColumnDef="update">
       <th mat-header-cell *matHeaderCellDef>Update Role</th>
       <td mat-cell *matCellDef="let user">
-        <button
-          class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          (click)="updateRole(user.email)"
-        >
+        <button mat-button color="primary" (click)="updateRole(user.email)">
           Update
         </button>
       </td>
@@ -49,16 +64,13 @@
     <ng-container matColumnDef="delete">
       <th mat-header-cell *matHeaderCellDef>Delete</th>
       <td mat-cell *matCellDef="let user">
-        <button
-          class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
-          (click)="deleteUser(user.email)"
-        >
+        <button mat-button color="warn" (click)="deleteUser(user.email)">
           Delete
         </button>
       </td>
     </ng-container>
 
-    <!-- Header & Row Declarations -->
+    <!-- Row Definitions -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>

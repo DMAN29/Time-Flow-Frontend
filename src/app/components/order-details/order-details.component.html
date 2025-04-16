@@ -1,78 +1,130 @@
-<!-- order-details.component.html -->
-<div class="p-6 space-y-6 lg:w-[90%] mx-auto">
-  <!-- Order Details Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div><strong>Style No:</strong> {{ order?.styleNo }}</div>
-    <div><strong>Item No:</strong> {{ order?.itemNo }}</div>
-    <div><strong>Description:</strong> {{ order?.description }}</div>
-    <div><strong>Fabric:</strong> {{ order?.fabric }}</div>
-    <div><strong>Division:</strong> {{ order?.division }}</div>
-    <div><strong>Buyer:</strong> {{ order?.buyer }}</div>
-    <div>
-      <strong>Order Quantity:</strong> {{ order?.orderQuantity | number }}
+<div class="p-6 space-y-8 lg:w-[90%] mx-auto">
+  <!-- Order Summary Section -->
+  <h2 class="text-xl font-bold text-gray-800">Order Summary</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Style No:</strong>
+      <span class="text-gray-700">{{ order?.styleNo }}</span>
     </div>
-    <div><strong>Target:</strong> {{ order?.target }}</div>
-    <div><strong>Efficiency:</strong> {{ order?.efficiency }}%</div>
-    <div><strong>Design Output:</strong> {{ order?.designOutput }}</div>
-    <div><strong>Line Design:</strong> {{ order?.lineDesign }}</div>
-    <div><strong>Allowance:</strong> {{ order?.allowance }}%</div>
-    <div><strong>Lane:</strong> {{ order?.lane }}</div>
-    <div><strong>Created By:</strong> {{ order?.createdBy || "N/A" }}</div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Item No:</strong>
+      <span class="text-gray-700">{{ order?.itemNo }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Description:</strong>
+      <span class="text-gray-700">{{ order?.description }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Fabric:</strong>
+      <span class="text-gray-700">{{ order?.fabric }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Division:</strong>
+      <span class="text-gray-700">{{ order?.division }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Buyer:</strong>
+      <span class="text-gray-700">{{ order?.buyer }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Order Quantity:</strong>
+      <span class="text-gray-700">{{ order?.orderQuantity | number }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Target:</strong>
+      <span class="text-gray-700">{{ order?.target }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Efficiency:</strong>
+      <span class="text-gray-700">{{ order?.efficiency }}%</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Design Output:</strong>
+      <span class="text-gray-700">{{ order?.designOutput }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Line Design:</strong>
+      <span class="text-gray-700">{{ order?.lineDesign }}</span>
+    </div>
+    <!-- <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Allowance:</strong>
+      <span class="text-gray-700">{{ order?.allowance }}%</span>
+    </div> -->
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Lane:</strong>
+      <span class="text-gray-700">{{ order?.lane }}</span>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-sm">
+      <strong>Created By:</strong>
+      <span class="text-gray-700">{{ order?.createdBy || "N/A" }}</span>
+    </div>
   </div>
 
-  <!-- Operations Table -->
-  <div class="overflow-auto rounded shadow-md">
+  <!-- Operations Table Section -->
+  <h2 class="text-xl font-bold text-gray-800 mt-6">Operations Breakdown</h2>
+  <div class="overflow-auto rounded shadow-lg">
     <table
       mat-table
       [dataSource]="dataSource"
-      class="mat-elevation-z8 w-full min-w-[900px]"
+      class="mat-elevation-z8 w-full min-w-[1000px]"
     >
+      <!-- ID Column -->
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>ID</th>
         <td mat-cell *matCellDef="let op">{{ op.id ?? "" }}</td>
       </ng-container>
 
+      <!-- Operation Name Column -->
       <ng-container matColumnDef="operationName">
         <th mat-header-cell *matHeaderCellDef>Operation</th>
         <td
           mat-cell
           *matCellDef="let op"
-          [ngClass]="{ 'font-semibold': op.operationName === 'Total' }"
+          [ngClass]="{
+            'font-semibold text-blue-600': op.operationName === 'Total'
+          }"
         >
           {{ op.operationName }}
         </td>
       </ng-container>
 
+      <!-- Section Column -->
       <ng-container matColumnDef="section">
         <th mat-header-cell *matHeaderCellDef>Section</th>
         <td mat-cell *matCellDef="let op">{{ op.section }}</td>
       </ng-container>
 
+      <!-- SAM Column -->
       <ng-container matColumnDef="sam">
         <th mat-header-cell *matHeaderCellDef>SAM</th>
         <td mat-cell *matCellDef="let op">{{ op.sam }}</td>
       </ng-container>
 
+      <!-- Machine Type Column -->
       <ng-container matColumnDef="machineType">
         <th mat-header-cell *matHeaderCellDef>Machine</th>
         <td mat-cell *matCellDef="let op">{{ op.machineType }}</td>
       </ng-container>
 
+      <!-- Required Column -->
       <ng-container matColumnDef="required">
         <th mat-header-cell *matHeaderCellDef>Required</th>
         <td mat-cell *matCellDef="let op">{{ op.required }}</td>
       </ng-container>
 
+      <!-- Allocated Column -->
       <ng-container matColumnDef="allocated">
         <th mat-header-cell *matHeaderCellDef>Allocated</th>
         <td mat-cell *matCellDef="let op">{{ op.allocated }}</td>
       </ng-container>
 
+      <!-- Target Column -->
       <ng-container matColumnDef="target">
         <th mat-header-cell *matHeaderCellDef>Target</th>
         <td mat-cell *matCellDef="let op">{{ op.target }}</td>
       </ng-container>
 
+      <!-- Table Headers and Rows -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>

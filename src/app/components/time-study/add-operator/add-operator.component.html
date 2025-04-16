@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Add Operator</h2>
+
+<mat-dialog-content class="space-y-3 mt-2">
+  <p><strong>Operation:</strong> {{ data.operationName }}</p>
+  <p><strong>Section:</strong> {{ data.section }}</p>
+  <p><strong>Machine Type:</strong> {{ data.machineType }}</p>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Operator ID</mat-label>
+    <input matInput [(ngModel)]="operatorId" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Operator Name</mat-label>
+    <input matInput [(ngModel)]="operatorName" />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onNext()"
+    [disabled]="!operatorId || !operatorName"
+  >
+    Next
+  </button>
+</mat-dialog-actions>
