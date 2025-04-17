@@ -1,20 +1,32 @@
-<h2 mat-dialog-title class="text-lg font-semibold mb-4">
-  Add Remarks for {{ data.operationName }} ({{ data.section }})
-</h2>
+<div class="p-4 w-full max-w-md">
+  <h2 mat-dialog-title class="text-xl font-semibold text-blue-700 mb-4">
+    Add Remarks for {{ data.operatorName }}
+  </h2>
 
-<mat-form-field appearance="outline" class="w-full">
-  <mat-label>Remarks</mat-label>
-  <input matInput [(ngModel)]="remarks" />
-</mat-form-field>
+  <div class="text-sm text-gray-600 mb-2">
+    <p><strong>Operation:</strong> {{ data.operationName }}</p>
+    <p><strong>Section:</strong> {{ data.section }}</p>
+  </div>
 
-<div class="mt-4 flex justify-end gap-4">
-  <button mat-stroked-button (click)="onCancel()">Cancel</button>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="onSubmit()"
-    [disabled]="!remarks.trim()"
-  >
-    Submit
-  </button>
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Remarks</mat-label>
+    <input matInput [(ngModel)]="remarks" placeholder="Enter remarks..." />
+  </mat-form-field>
+
+  <div class="mt-6 flex justify-end gap-3">
+    <button mat-stroked-button color="warn" (click)="onCancel()">
+      <mat-icon class="mr-1">close</mat-icon>
+      Cancel
+    </button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="!remarks.trim()"
+    >
+      <mat-icon class="mr-1">check_circle</mat-icon>
+      Submit
+    </button>
+  </div>
 </div>

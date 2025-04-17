@@ -15,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AddOperatorComponent } from './add-operator/add-operator.component';
 import { AddRemarksComponent } from './add-remarks/add-remarks.component';
+import { TimeStudy } from '../../model/TimeStudy';
 
 @Component({
   selector: 'app-time-study',
@@ -266,6 +267,13 @@ export class TimeStudyComponent implements OnInit {
     rIdx: number,
     rowId: string | null
   ): void {
+    if (rowId != null) {
+      const confirmDelete = confirm(
+        'Are you sure you want to remove this row?'
+      );
+      if (!confirmDelete) return;
+    }
+
     if (group.rows.length > group.initialCount) {
       // Optionally delete from backend if the row was saved
       if (rowId) {
@@ -307,7 +315,7 @@ export class TimeStudyComponent implements OnInit {
     });
   }
 
-  goToStopwatch(row: any): void {
+  goToStopwatch(row: TimeStudy): void {
     const styleNo = this.route.snapshot.paramMap.get('styleNo');
     this.router.navigate(['/stop-watch'], {
       queryParams: {
@@ -322,10 +330,14 @@ export class TimeStudyComponent implements OnInit {
       },
     });
   }
-  openAddRemarksDialog(row: any): void {
+  openAddRemarksDialog(row: TimeStudy): void {
     const dialogRef = this.dialog.open(AddRemarksComponent, {
       width: '400px',
-      data: { operatorName: row.operatorName },
+      data: {
+        operatorName: row.operatorName,
+        operationName: row.operationName,
+        section: row.section,
+      },
     });
 
     dialogRef.afterClosed().subscribe((remark: string) => {

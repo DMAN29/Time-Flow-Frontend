@@ -83,17 +83,19 @@
             class="hover:bg-gray-50"
           >
             <td
-              class="border px-3 py-2 text-center align-top"
+              class="border px-3 py-2 text-center font-bold text-2xl align-center"
               *ngIf="rIdx === 0"
               [attr.rowspan]="group.rows.length"
             >
               {{ groupedOperations.indexOf(group) + 1 }}
               <button
+                mat-mini-fab
+                disableRipple
                 (click)="addDuplicate(group)"
-                class="ml-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 leading-5"
+                class="ml-2 !bg-green-500 hover:!bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow"
                 title="Add Row"
               >
-                +
+                <mat-icon>add</mat-icon>
               </button>
             </td>
 
@@ -123,31 +125,22 @@
               <!-- Add Remarks -->
               <button
                 mat-mini-fab
-                color="accent"
+                color="accent !bg-teal-500 hover:!bg-teal-600"
                 matTooltip="Add Remarks"
                 *ngIf="row.operatorId && !row.remarks"
-                (click)="openAddRemarksDialog(row.id)"
+                (click)="openAddRemarksDialog(row)"
               >
                 <mat-icon>note_add</mat-icon>
               </button>
 
               <!-- If remarks exist, show in table -->
-              <span *ngIf="row.remarks" class="text-xs text-blue-600">
+              <span
+                *ngIf="row.remarks"
+                class="bg-yellow-100 text-yellow-800 font-semibold text-sm px-3 py-1 rounded-md shadow-sm max-w-[120px] truncate inline-block"
+              >
                 {{ row.remarks }}
               </span>
             </td>
-
-            <!-- <td class="border px-3 py-2 text-center">
-              <span *ngIf="row.remarks">{{ row.remarks }}</span>
-              <button
-                *ngIf="row.operatorId && row.operatorName && !row.remarks"
-                mat-button
-                color="primary"
-                (click)="openAddRemarksDialog(row)"
-              >
-                Add Remarks
-              </button>
-            </td> -->
 
             <td class="border px-3 py-2 text-center">
               <div class="flex gap-2 justify-center items-center">
@@ -178,8 +171,9 @@
                 </button>
                 <button
                   mat-mini-fab
-                  color="warn"
-                  matTooltip="Remove Row"
+                  disableRipple
+                  class="!bg-red-500 hover:!bg-red-600"
+                  matTooltip="Remove Operator"
                   *ngIf="group.rows.length > group.initialCount"
                   (click)="removeRow(group, rIdx, row.id)"
                 >

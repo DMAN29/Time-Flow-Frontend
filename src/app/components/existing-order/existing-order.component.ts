@@ -9,9 +9,12 @@ import { MatButton } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
+import { UserService } from '../../service/user.service';
+import { ApiResponse } from '../../model/ApiResponse';
 
 @Component({
   selector: 'app-existing-order',
+  standalone: true,
   imports: [
     CommonModule,
     MatTableModule,
@@ -28,6 +31,8 @@ export class ExistingOrderComponent implements OnInit {
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   searchText: string = '';
+  isAdmin: boolean = false;
+
   displayedColumns: string[] = [
     'sno',
     'styleNo',
@@ -37,16 +42,28 @@ export class ExistingOrderComponent implements OnInit {
     'target',
     'efficiency',
     'designOutput',
-    // 'allowance',
     'lane',
     'lineDesign',
     'view',
     'timeStudy',
   ];
 
-  constructor(private orderService: OrderService, private router: Router) {}
+  constructor(
+    private orderService: OrderService,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
+    // Subscribe to admin role
+    this.userService.isAdmin$.subscribe((res) => {
+      this.isAdmin = res;
+      if (this.isAdmin && !this.displayedColumns.includes('delete')) {
+        this.displayedColumns.push('delete');
+      }
+    });
+
+    // Load all orders
     this.orderService.getAllOrders().subscribe({
       next: (data) => {
         this.orders = data;
@@ -58,21 +75,33 @@ export class ExistingOrderComponent implements OnInit {
 
   applyFilter(): void {
     const value = this.searchText.trim().toLowerCase();
-    if (!value) {
-      // If input is empty, show all
-      this.filteredOrders = this.orders;
-    } else {
-      // Filter by styleNo
-      this.filteredOrders = this.orders.filter((order) =>
-        order.styleNo.toLowerCase().includes(value)
-      );
-    }
+    this.filteredOrders = value
+      ? this.orders.filter((order) =>
+          order.styleNo.toLowerCase().includes(value)
+        )
+      : this.orders;
   }
 
   goToOrderDetails(styleNo: string) {
     this.router.navigate(['/order', styleNo]);
   }
+
   goToTimeStudy(styleNo: string) {
     this.router.navigate(['/time-study', styleNo]);
+  }
+
+  deleteOrder(styleNo: string): void {
+    if (confirm(`Are you sure you want to delete Style No: ${styleNo}?`)) {
+      this.orderService.deleteOrder(styleNo).subscribe({
+        next: (res: ApiResponse) => {
+          console.log('✅', res.message);
+          // Remove from UI
+          this.filteredOrders = this.filteredOrders.filter(
+            (order) => order.styleNo !== styleNo
+          );
+        },
+        error: (err) => console.error('❌ Failed to delete order:', err),
+      });
+    }
   }
 }

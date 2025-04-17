@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-add-remarks',
@@ -17,6 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatIcon,
   ],
 })
 export class AddRemarksComponent {
@@ -25,7 +27,11 @@ export class AddRemarksComponent {
   constructor(
     public dialogRef: MatDialogRef<AddRemarksComponent>,
     @Inject(MAT_DIALOG_DATA)
-    public data: { operationName: string; section: string }
+    public data: {
+      operatorName: string;
+      section: string;
+      operationName: string;
+    }
   ) {}
 
   onCancel(): void {

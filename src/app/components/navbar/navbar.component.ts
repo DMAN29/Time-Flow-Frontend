@@ -29,16 +29,25 @@ export class NavbarComponent implements OnInit {
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
+    // Load user profile to populate BehaviorSubject
+    this.userService.loadUserProfile();
+
+    // Subscribe to admin status
+    this.userService.isAdmin$.subscribe((admin) => {
+      this.isAdmin = admin;
+    });
+
+    // Optionally load full profile for display purposes
     this.userService.getUserProfile().subscribe({
       next: (res) => {
         this.user = res;
-        this.isAdmin = res.role.includes('ROLE_ADMIN');
       },
       error: (err) => {
         console.error('Failed to fetch user profile', err);
       },
     });
   }
+
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
   }

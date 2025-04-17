@@ -76,4 +76,12 @@ export class OrderService {
       getAuthHeaders() // or just `{ headers: ... }`
     );
   }
+
+  deleteOrder(styleNo: string): Observable<ApiResponse> {
+    const token = localStorage.getItem('token') || '';
+    return this.http.delete<ApiResponse>(
+      `${this.URL}/delete/${styleNo}`,
+      getAuthHeaders()
+    );
+  }
 }

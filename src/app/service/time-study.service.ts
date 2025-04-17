@@ -56,8 +56,8 @@ export class TimeStudyService {
   // ✅ Update Remarks
   updateRemarks(id: string, remark: string): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(
-      `${this.URL}/remarks/${id}`,
-      remark,
+      `${this.URL}/remarks/${id}?remarks=${encodeURIComponent(remark)}`,
+      {}, // empty body
       getAuthHeaders()
     );
   }
