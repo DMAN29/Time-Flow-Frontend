@@ -8,19 +8,23 @@ import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIcon } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-users-list',
+  standalone: true,
   imports: [
     CommonModule,
     MatTableModule,
     MatProgressSpinnerModule,
     MatButton,
+    MatButtonModule,
     MatLabel,
     FormsModule,
     MatFormField,
     MatInput,
     MatIcon,
+    MatSelectModule,
   ],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.css',
@@ -29,12 +33,13 @@ export class UsersListComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
   filterValue: string = '';
-
+  loggedInRoles: string[] = [];
   displayedColumns: string[] = [
     'S.No',
     'name',
     'email',
     'role',
+    'createdAt',
     'update',
     'delete',
   ];
@@ -42,6 +47,21 @@ export class UsersListComponent implements OnInit {
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
+    this.userService.roles$.subscribe((roles) => {
+      this.loggedInRoles = roles;
+
+      if (
+        this.loggedInRoles.includes('ROLE_HEAD') &&
+        !this.displayedColumns.includes('company')
+      ) {
+        this.displayedColumns.splice(4, 0, 'company'); // insert after role
+      }
+    });
+
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
     this.userService.getAllUsers().subscribe({
       next: (data) => {
         this.users = data;
@@ -64,13 +84,22 @@ export class UsersListComponent implements OnInit {
     }
   }
 
-  updateRole(email: string): void {
-    this.userService.changeUserRole(email).subscribe({
+  getCurrentRole(user: User): string {
+    if (user.role.includes('ROLE_ADMIN')) return 'ROLE_ADMIN';
+    if (user.role.includes('ROLE_USER')) return 'ROLE_USER';
+    return 'NONE';
+  }
+
+  updateRole(email: string, role: string): void {
+    this.userService.changeUserRole(email, role).subscribe({
       next: () => {
-        alert('Role updated!');
-        this.ngOnInit(); // Refresh
+        alert(`Role updated to ${role}`);
+        this.loadUsers();
       },
-      error: (err) => console.error('Error updating role:', err),
+      error: (err) => {
+        console.error('Error updating role:', err);
+        alert('Failed to update role.');
+      },
     });
   }
 
@@ -79,7 +108,7 @@ export class UsersListComponent implements OnInit {
       this.userService.deleteUser(email).subscribe({
         next: () => {
           alert('User deleted!');
-          this.ngOnInit();
+          this.loadUsers();
         },
         error: (err) => console.error('Error deleting user:', err),
       });

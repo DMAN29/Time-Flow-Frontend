@@ -9,52 +9,42 @@ import { OrderDetailsComponent } from './components/order-details/order-details.
 import { authGuard } from './guard/auth.guard';
 import { TimeStudyComponent } from './components/time-study/time-study.component';
 import { StopWatchComponent } from './components/stop-watch/stop-watch.component';
-// import { StopWatchComponent } from './components/time-study/stop-watch/stop-watch.component';
+import { CompanyComponent } from './components/company/company.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 export const routes: Routes = [
+  // 🔓 Public routes (only for guests)
   {
     path: 'sign-in',
     component: SignInComponent,
+    canActivate: [authGuard],
+    data: { guestOnly: true },
   },
   {
     path: 'sign-up',
     component: SignUpComponent,
+    canActivate: [authGuard],
+    data: { guestOnly: true },
   },
 
+  // 🔐 Authenticated routes
   {
     path: '',
     canActivate: [authGuard],
     children: [
-      {
-        path: '',
-        component: HomeComponent,
-      },
-      {
-        path: 'add-order',
-        component: NewOrderComponent,
-      },
-      {
-        path: 'orders',
-        component: ExistingOrderComponent,
-      },
-      {
-        path: 'users',
-        component: UsersListComponent,
-      },
-      {
-        path: 'order/:styleNo',
-        component: OrderDetailsComponent,
-      },
-      {
-        path: 'time-study/:styleNo',
-        component: TimeStudyComponent,
-      },
-      {
-        path: 'stop-watch',
-        component: StopWatchComponent,
-      },
+      { path: '', component: HomeComponent },
+      { path: 'add-order', component: NewOrderComponent },
+      { path: 'orders', component: ExistingOrderComponent },
+      { path: 'users', component: UsersListComponent },
+      { path: 'order/:styleNo', component: OrderDetailsComponent },
+      { path: 'time-study/:styleNo', component: TimeStudyComponent },
+      { path: 'stop-watch', component: StopWatchComponent },
+      { path: 'company', component: CompanyComponent },
+      { path: 'profile', component: ProfileComponent },
     ],
   },
+
+  // 🔁 Fallback
   {
     path: '**',
     redirectTo: '',

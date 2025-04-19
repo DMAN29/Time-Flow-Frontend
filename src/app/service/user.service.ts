@@ -10,42 +10,40 @@ import { ApiResponse } from '../model/ApiResponse';
 })
 export class UserService {
   private URL = `${BASE_URL}/api/user`;
-  private isAdminSubject = new BehaviorSubject<boolean>(false);
-  isAdmin$ = this.isAdminSubject.asObservable(); // for use in other components
+
+  private rolesSubject = new BehaviorSubject<string[]>([]);
+  roles$ = this.rolesSubject.asObservable(); // use this in components
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Get all users (assuming public or admin endpoint)
-  getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.URL}`, getAuthHeaders());
-  }
-
+  // Get profile and store roles
   loadUserProfile(): void {
     this.getUserProfile().subscribe({
       next: (res) => {
-        this.isAdminSubject.next(res.role.includes('ROLE_ADMIN'));
+        this.rolesSubject.next(res.role); // store the full role list
       },
       error: () => {
-        this.isAdminSubject.next(false);
+        this.rolesSubject.next([]);
       },
     });
   }
 
-  // ✅ Get profile (requires auth)
   getUserProfile(): Observable<User> {
     return this.http.get<User>(`${this.URL}/profile`, getAuthHeaders());
   }
 
-  // ✅ Change user role (requires auth)
-  changeUserRole(email: string): Observable<ApiResponse> {
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.URL}`, getAuthHeaders());
+  }
+
+  changeUserRole(email: string, role: string): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(
-      `${this.URL}/change-role?email=${email}`,
+      `${this.URL}/change-role?email=${email}&role=${role}`,
       {},
       getAuthHeaders()
     );
   }
 
-  // ✅ Delete user (requires auth)
   deleteUser(email: string): Observable<ApiResponse> {
     return this.http.delete<ApiResponse>(
       `${this.URL}/delete?email=${email}`,

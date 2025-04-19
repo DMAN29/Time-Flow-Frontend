@@ -128,7 +128,7 @@
             mat-button
             color="warn"
             (click)="deleteOrder(order.styleNo)"
-            *ngIf="isAdmin"
+            *ngIf="userRoles.length > 1"
           >
             Delete
           </button>

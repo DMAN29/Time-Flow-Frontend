@@ -22,60 +22,127 @@
 
   <!-- Center: Navigation Links (hidden on small screens) -->
   <div class="hidden md:flex gap-6">
-    <a
-      routerLink="/add-order"
-      class="text-gray-700 hover:text-blue-600 font-medium"
-      >Add New Order</a
-    >
-    <a
-      routerLink="/orders"
-      class="text-gray-700 hover:text-blue-600 font-medium"
-      >Existing Orders</a
-    >
-    <a
-      *ngIf="isAdmin"
-      routerLink="/users"
-      class="text-gray-700 hover:text-blue-600 font-medium"
-      >Registered Users</a
-    >
+    <!-- Desktop -->
+    <div class="hidden md:flex gap-6">
+      <a
+        routerLink="/"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="bg-blue-100 text-blue-700 font-semibold"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-gray-700 hover:text-blue-600 font-medium px-3 py-1 rounded-md transition-colors"
+        >Home</a
+      >
+      <a
+        *ngIf="userRoles.includes('ROLE_USER')"
+        routerLink="/add-order"
+        routerLinkActive="bg-blue-100 text-blue-700 font-semibold"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-gray-700 hover:text-blue-600 font-medium px-3 py-1 rounded-md transition-colors"
+        >Add New Order</a
+      >
+      <a
+        *ngIf="userRoles.includes('ROLE_USER')"
+        routerLink="/orders"
+        routerLinkActive="bg-blue-100 text-blue-700 font-semibold"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-gray-700 hover:text-blue-600 font-medium px-3 py-1 rounded-md transition-colors"
+        >Existing Orders</a
+      >
+      <a
+        *ngIf="userRoles.includes('ROLE_ADMIN')"
+        routerLink="/users"
+        routerLinkActive="bg-blue-100 text-blue-700 font-semibold"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-gray-700 hover:text-blue-600 font-medium px-3 py-1 rounded-md transition-colors"
+        >Registered Users</a
+      >
+      <a
+        *ngIf="userRoles.includes('ROLE_HEAD')"
+        routerLink="/company"
+        routerLinkActive="bg-blue-100 text-blue-700 font-semibold"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-gray-700 hover:text-blue-600 font-medium px-3 py-1 rounded-md transition-colors"
+        >Companies List</a
+      >
+    </div>
   </div>
 
   <!-- Right: Profile (hidden on small screens) -->
   <div class="hidden md:flex items-center gap-2">
-    <span class="text-gray-600 text-sm">Hello, {{ user?.firstName }}</span>
-    <mat-icon>account_circle</mat-icon>
+    <button
+      mat-button
+      [matMenuTriggerFor]="userMenu"
+      class="flex items-center gap-1"
+    >
+      <span class="text-sm text-gray-700">{{ user?.firstName }}</span>
+      <mat-icon>account_circle</mat-icon>
+      <!-- <mat-icon>expand_more</mat-icon> -->
+    </button>
+
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item (click)="goToProfile()">
+        <div class="flex items-center gap-2">
+          <span>Profile</span>
+          <mat-icon>person</mat-icon>
+        </div>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <div class="flex items-center gap-2">
+          <span>Logout</span>
+          <mat-icon>logout</mat-icon>
+        </div>
+      </button>
+    </mat-menu>
+  </div>
+
+  <!-- Mobile Menu Dropdown -->
+  <div
+    *ngIf="menuOpen"
+    class="md:hidden bg-white border-t shadow px-4 py-3 space-y-4"
+  >
+    <!-- Center links -->
+    <!-- Mobile -->
+    <a
+      routerLink="/"
+      routerLinkActive="text-blue-600 font-semibold underline"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="block text-gray-700 hover:text-blue-600 font-medium"
+      >Home</a
+    >
+    <a
+      routerLink="/add-order"
+      routerLinkActive="text-blue-600 font-semibold underline"
+      class="block text-gray-700 hover:text-blue-600 font-medium"
+      >Add New Order</a
+    >
+    <a
+      routerLink="/orders"
+      routerLinkActive="text-blue-600 font-semibold underline"
+      class="block text-gray-700 hover:text-blue-600 font-medium"
+      >Existing Orders</a
+    >
+    <a
+      *ngIf="userRoles.includes('ROLE_ADMIN')"
+      routerLink="/users"
+      routerLinkActive="text-blue-600 font-semibold underline"
+      class="block text-gray-700 hover:text-blue-600 font-medium"
+      >Registered Users</a
+    >
+    <a
+      *ngIf="userRoles.includes('ROLE_HEAD')"
+      routerLink="/company"
+      routerLinkActive="text-blue-600 font-semibold underline"
+      class="block text-gray-700 hover:text-blue-600 font-medium"
+      >Companies List</a
+    >
+
+    <!-- Divider -->
+    <hr />
+
+    <!-- Profile at bottom -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 text-sm">Hello, {{ user?.firstName }}</span>
+      <mat-icon>account_circle</mat-icon>
+    </div>
   </div>
 </nav>
-
-<!-- Mobile Menu Dropdown -->
-<div
-  *ngIf="menuOpen"
-  class="md:hidden bg-white border-t shadow px-4 py-3 space-y-4"
->
-  <!-- Center links -->
-  <a
-    routerLink="/add-order"
-    class="block text-gray-700 hover:text-blue-600 font-medium"
-    >Add New Order</a
-  >
-  <a
-    routerLink="/orders"
-    class="block text-gray-700 hover:text-blue-600 font-medium"
-    >Existing Orders</a
-  >
-  <a
-    *ngIf="isAdmin"
-    routerLink="/users"
-    class="block text-gray-700 hover:text-blue-600 font-medium"
-    >Registered Users</a
-  >
-
-  <!-- Divider -->
-  <hr />
-
-  <!-- Profile at bottom -->
-  <div class="flex items-center justify-between">
-    <span class="text-gray-600 text-sm">Hello, {{ user?.firstName }}</span>
-    <mat-icon>account_circle</mat-icon>
-  </div>
-</div>

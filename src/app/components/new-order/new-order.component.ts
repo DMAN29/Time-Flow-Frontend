@@ -49,11 +49,7 @@ export class NewOrderComponent {
         null,
         [Validators.required, Validators.min(1), Validators.max(100)],
       ],
-      allowance: [
-        null,
-        [Validators.required, Validators.min(0), Validators.max(100)],
-      ],
-      line: ['', Validators.required],
+      line: [null, Validators.required],
       file: [null, Validators.required],
     });
   }
@@ -62,27 +58,29 @@ export class NewOrderComponent {
     return this.orderForm.controls;
   }
 
-  // formatNumber(value: any): string {
-  //   if (value == null || value === '') return '';
-  //   const num = parseInt(value.toString().replace(/,/g, ''), 10);
-  //   return isNaN(num) ? '' : num.toLocaleString('en-US');
-  // }
+  // Format numbers with commas for display
+  formatWithCommas(value: any): string {
+    if (value == null || value === '') return '';
+    const num = parseInt(value.toString().replace(/,/g, ''), 10);
+    return isNaN(num) ? '' : num.toLocaleString('en-US');
+  }
 
-  // updateNumber(controlName: string, event: Event) {
-  //   const target = event.target as HTMLInputElement;
-  //   const rawValue = target.value.replace(/,/g, '');
-  //   const numericValue = parseInt(rawValue, 10);
-  //   const control = this.orderForm.get(controlName);
+  // Update FormControl on formatted input
+  updateFormattedNumber(controlName: string, event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const rawValue = target.value.replace(/,/g, '');
+    const numericValue = parseInt(rawValue, 10);
+    const control = this.orderForm.get(controlName);
 
-  //   if (!isNaN(numericValue)) {
-  //     control?.setValue(numericValue);
-  //   } else {
-  //     control?.setValue(null);
-  //   }
+    if (!isNaN(numericValue)) {
+      control?.setValue(numericValue);
+    } else {
+      control?.setValue(null);
+    }
 
-  //   // ✅ Ensure touched state so error appears
-  //   control?.markAsTouched();
-  // }
+    control?.markAsTouched();
+    target.value = this.formatWithCommas(control?.value);
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -114,7 +112,6 @@ export class NewOrderComponent {
   }
 
   onSubmit(): void {
-    console.log('Form submitted');
     if (this.orderForm.valid) {
       const raw = this.orderForm.value;
       const formData = new FormData();
@@ -131,23 +128,24 @@ export class NewOrderComponent {
               division: raw.division,
               buyer: raw.buyer,
               description: raw.description,
-              orderQuantity: raw.orderQuantity,
-              target: raw.target,
+              orderQuantity: Number(raw.orderQuantity),
+              target: Number(raw.target),
               efficiency: raw.efficiency,
               lane: raw.line,
-              allowance: raw.allowance,
             }),
           ],
           { type: 'application/json' }
         )
       );
-
       this.orderService.createOrder(formData).subscribe({
         next: (res: Order) => {
           alert('Order created successfully!');
           console.log('Order created:', res);
           this.orderForm.reset();
           this.selectedFile = null;
+
+          // 👇 Navigate to Existing Orders page
+          this.router.navigate(['/orders']);
         },
         error: (err) => {
           console.error('Error creating order:', err);

@@ -23,4 +23,11 @@ export class AuthService {
   register(user: Partial<User>): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.URL}/register`, user);
   }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+  logout(): void {
+    localStorage.removeItem('token'); // or whatever key you store the token in
+  }
 }

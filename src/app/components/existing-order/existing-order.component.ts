@@ -31,7 +31,8 @@ export class ExistingOrderComponent implements OnInit {
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   searchText: string = '';
-  isAdmin: boolean = false;
+  // isAdmin: boolean = false;
+  userRoles: string[] = [];
 
   displayedColumns: string[] = [
     'sno',
@@ -56,11 +57,18 @@ export class ExistingOrderComponent implements OnInit {
 
   ngOnInit(): void {
     // Subscribe to admin role
-    this.userService.isAdmin$.subscribe((res) => {
-      this.isAdmin = res;
-      if (this.isAdmin && !this.displayedColumns.includes('delete')) {
+    this.userService.roles$.subscribe((roles) => {
+      this.userRoles = roles; // Store all roles locally
+
+      // Show "delete" column only for users with ROLE_ADMIN
+      if (
+        roles.includes('ROLE_ADMIN') &&
+        !this.displayedColumns.includes('delete')
+      ) {
         this.displayedColumns.push('delete');
       }
+
+      // You can add more conditions here based on other roles (e.g., ROLE_HEAD)
     });
 
     // Load all orders

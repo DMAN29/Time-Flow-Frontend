@@ -49,14 +49,39 @@
       <th mat-header-cell *matHeaderCellDef>Role</th>
       <td mat-cell *matCellDef="let user">{{ user.role.join(", ") }}</td>
     </ng-container>
+    <!-- Created At -->
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef>Created At</th>
+      <td mat-cell *matCellDef="let user">
+        {{ user.createdAt | date : "mediumDate" }}
+      </td>
+    </ng-container>
+
+    <!-- Company (HEAD only) -->
+    <ng-container
+      *ngIf="loggedInRoles.includes('ROLE_HEAD')"
+      matColumnDef="company"
+    >
+      <th mat-header-cell *matHeaderCellDef>Company</th>
+      <td mat-cell *matCellDef="let user">{{ user.company }}</td>
+    </ng-container>
 
     <!-- Update Role -->
     <ng-container matColumnDef="update">
       <th mat-header-cell *matHeaderCellDef>Update Role</th>
       <td mat-cell *matCellDef="let user">
-        <button mat-button color="primary" (click)="updateRole(user.email)">
-          Update
-        </button>
+        <mat-form-field appearance="fill" class="w-36">
+          <mat-label>Role</mat-label>
+          <mat-select
+            [value]="getCurrentRole(user)"
+            (selectionChange)="updateRole(user.email, $event.value)"
+            [disabled]="user.role.length >= loggedInRoles.length"
+            matTooltip="Cannot update user with same role level"
+          >
+            <mat-option value="ROLE_USER">User</mat-option>
+            <mat-option value="ROLE_ADMIN">Admin</mat-option>
+          </mat-select>
+        </mat-form-field>
       </td>
     </ng-container>
 
@@ -64,7 +89,13 @@
     <ng-container matColumnDef="delete">
       <th mat-header-cell *matHeaderCellDef>Delete</th>
       <td mat-cell *matCellDef="let user">
-        <button mat-button color="warn" (click)="deleteUser(user.email)">
+        <button
+          mat-button
+          color="warn"
+          (click)="deleteUser(user.email)"
+          [disabled]="user.role.length >= loggedInRoles.length"
+          matTooltip="Delete disabled for same or higher role level"
+        >
           Delete
         </button>
       </td>
