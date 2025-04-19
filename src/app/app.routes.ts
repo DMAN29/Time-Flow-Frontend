@@ -11,6 +11,7 @@ import { TimeStudyComponent } from './components/time-study/time-study.component
 import { StopWatchComponent } from './components/stop-watch/stop-watch.component';
 import { CompanyComponent } from './components/company/company.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { TableDesignComponent } from './components/order-details/table-design/table-design.component';
 
 export const routes: Routes = [
   // 🔓 Public routes (only for guests)
@@ -41,6 +42,7 @@ export const routes: Routes = [
       { path: 'stop-watch', component: StopWatchComponent },
       { path: 'company', component: CompanyComponent },
       { path: 'profile', component: ProfileComponent },
+      { path: 'table/:styleNo', component: TableDesignComponent },
     ],
   },
 

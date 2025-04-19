@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-company',
@@ -20,6 +21,7 @@ import { CommonModule } from '@angular/common';
     MatProgressSpinnerModule,
     FormsModule,
     CommonModule,
+    MatTooltip,
   ],
   templateUrl: './company.component.html',
   styleUrls: ['./company.component.css'],
@@ -29,7 +31,7 @@ export class CompanyComponent implements OnInit {
   displayedColumns: string[] = ['sno', 'name', 'createdAt', 'actions'];
   newCompanyName: string = '';
   isLoading = false;
-
+  companyUsage: { [key: string]: boolean } = {};
   constructor(private companyService: CompanyService) {}
 
   ngOnInit(): void {
@@ -37,19 +39,18 @@ export class CompanyComponent implements OnInit {
   }
 
   loadCompanies(): void {
-    this.isLoading = true;
     this.companyService.getCompanyList().subscribe({
-      next: (res) => {
-        this.companies = res;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading companies:', err);
-        this.isLoading = false;
+      next: (companies) => {
+        this.companies = companies;
+        companies.forEach((company) => {
+          this.companyService.checkCompanyUsage(company.name).subscribe({
+            next: (inUse) => (this.companyUsage[company.name] = inUse),
+            error: () => (this.companyUsage[company.name] = false),
+          });
+        });
       },
     });
   }
-
   addCompany(): void {
     const name = this.newCompanyName.trim().toUpperCase();
     if (!name) return;

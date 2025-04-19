@@ -20,6 +20,7 @@ export interface Order {
   lane: number;
   noOfLaps: number;
   createdBy: string;
+  company: string;
 }
 
 export interface LaneRequest {

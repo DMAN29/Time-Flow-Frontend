@@ -26,4 +26,10 @@ export class CompanyService {
       getAuthHeaders()
     );
   }
+  checkCompanyUsage(name: string): Observable<boolean> {
+    return this.http.get<boolean>(
+      `${this.URL}/check/${name}`,
+      getAuthHeaders()
+    );
+  }
 }

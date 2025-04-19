@@ -83,11 +83,16 @@ export class ExistingOrderComponent implements OnInit {
 
   applyFilter(): void {
     const value = this.searchText.trim().toLowerCase();
-    this.filteredOrders = value
-      ? this.orders.filter((order) =>
-          order.styleNo.toLowerCase().includes(value)
-        )
-      : this.orders;
+
+    if (!value) {
+      this.filteredOrders = this.orders;
+    } else {
+      this.filteredOrders = this.orders.filter((order) => {
+        const styleNoMatch = order.styleNo.toLowerCase().includes(value);
+        const buyerMatch = order.buyer.toLowerCase().includes(value);
+        return styleNoMatch || buyerMatch;
+      });
+    }
   }
 
   goToOrderDetails(styleNo: string) {

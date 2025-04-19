@@ -1,1 +1,20 @@
-<p>profile works!</p>
+<mat-card class="p-6 flex items-center gap-6 shadow-md max-w-3xl mx-auto">
+  <!-- Left: Avatar -->
+  <div
+    class="bg-blue-600 text-white rounded-full w-24 h-24 flex items-center justify-center text-3xl font-bold"
+  >
+    {{ user?.firstName?.charAt(0) }}{{ user?.lastName?.charAt(0) }}
+  </div>
+
+  <!-- Right: User Info -->
+  <div class="flex flex-col space-y-1">
+    <div><strong>Name:</strong> {{ user?.firstName }} {{ user?.lastName }}</div>
+    <div><strong>User ID:</strong> {{ user?.userId }}</div>
+    <div><strong>Email:</strong> {{ user?.email }}</div>
+    <div><strong>Company:</strong> {{ user?.company }}</div>
+    <div><strong>Roles:</strong> {{ user?.role?.join(", ") }}</div>
+    <div>
+      <strong>Created At:</strong> {{ user?.createdAt | date : "mediumDate" }}
+    </div>
+  </div>
+</mat-card>

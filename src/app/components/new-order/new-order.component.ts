@@ -114,37 +114,33 @@ export class NewOrderComponent {
   onSubmit(): void {
     if (this.orderForm.valid) {
       const raw = this.orderForm.value;
-      const formData = new FormData();
 
+      const sanitizedOrder = {
+        styleNo: raw.styleNo.trim(),
+        itemNo: raw.itemNo.trim(),
+        fabric: raw.fabric.trim(),
+        division: raw.division.trim(),
+        buyer: raw.buyer.trim(),
+        description: raw.description.trim(),
+        orderQuantity: Number(raw.orderQuantity),
+        target: Number(raw.target),
+        efficiency: raw.efficiency,
+        lane: raw.line,
+      };
+
+      const formData = new FormData();
       formData.append('file', raw.file);
       formData.append(
         'order',
-        new Blob(
-          [
-            JSON.stringify({
-              styleNo: raw.styleNo,
-              itemNo: raw.itemNo,
-              fabric: raw.fabric,
-              division: raw.division,
-              buyer: raw.buyer,
-              description: raw.description,
-              orderQuantity: Number(raw.orderQuantity),
-              target: Number(raw.target),
-              efficiency: raw.efficiency,
-              lane: raw.line,
-            }),
-          ],
-          { type: 'application/json' }
-        )
+        new Blob([JSON.stringify(sanitizedOrder)], { type: 'application/json' })
       );
+
       this.orderService.createOrder(formData).subscribe({
         next: (res: Order) => {
           alert('Order created successfully!');
           console.log('Order created:', res);
           this.orderForm.reset();
           this.selectedFile = null;
-
-          // 👇 Navigate to Existing Orders page
           this.router.navigate(['/orders']);
         },
         error: (err) => {

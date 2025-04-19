@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIcon } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-users-list',
@@ -25,6 +26,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatInput,
     MatIcon,
     MatSelectModule,
+    MatTooltip,
   ],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.css',
@@ -78,9 +80,16 @@ export class UsersListComponent implements OnInit {
     if (!term) {
       this.filteredUsers = this.users;
     } else {
-      this.filteredUsers = this.users.filter((user) =>
-        `${user.firstName} ${user.lastName}`.toLowerCase().includes(term)
-      );
+      this.filteredUsers = this.users.filter((user) => {
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        const company = user.company?.toLowerCase() || '';
+
+        if (this.loggedInRoles.includes('ROLE_ADMIN')) {
+          return fullName.includes(term) || company.includes(term);
+        } else {
+          return fullName.includes(term);
+        }
+      });
     }
   }
 
