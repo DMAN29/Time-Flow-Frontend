@@ -20,17 +20,27 @@ export class TableDesignComponent implements OnInit {
   displayedBlocks: { left: any | null; right: any | null }[] = [];
 
   private colorPalette: string[] = [
-    '#ef4444',
-    '#3b82f6',
-    '#10b981',
-    '#facc15',
-    '#8b5cf6',
-    '#ec4899',
-    '#14b8a6',
-    '#f97316',
-    '#22d3ee',
-    '#84cc16',
+    '#A2CFFE',
+    '#BDFCC9',
+    '#E3E4FA',
+    '#FFE5B4',
+    '#F08080',
+    '#FFFFCC',
+    '#B0E0E6',
+    '#E0B0FF',
+    '#87CEEB',
+    '#9FE2BF',
+    '#AFEEEE',
+    '#F9C0C4',
+    '#CCCCFF',
+    '#FFDAB9',
+    '#E6CCFF',
+    '#FBCEB1',
+    '#D6F6FF',
+    '#FFFACD',
+    '#FFE0BD',
   ];
+
   private colorIndex = 0;
 
   constructor(

@@ -1,7 +1,8 @@
 <div class="p-6 space-y-8 lg:w-[90%] mx-auto">
-  <!-- Order Summary Section -->
-  <div class="flex justify-between items-center">
-    <h2 class="text-xl font-bold text-gray-800">Order Summary</h2>
+  <div class="flex justify-between">
+    <div>
+      <button mat-stroked-button color="warn" (click)="back()">Back</button>
+    </div>
 
     <div class="flex gap-3">
       <button mat-stroked-button color="primary" (click)="downloadExcel()">
@@ -11,6 +12,10 @@
         View Design
       </button>
     </div>
+  </div>
+  <!-- Order Summary Section -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-xl font-bold text-gray-800">Order Summary</h2>
   </div>
 
   <!-- Order Info -->

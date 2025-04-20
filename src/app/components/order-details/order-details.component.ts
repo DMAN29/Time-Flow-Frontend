@@ -100,10 +100,125 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   downloadExcel(): void {
-    console.log('✅ You clicked Download Excel');
+    if (!this.order) return;
+
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+
+    const headerRows = [
+      [
+        'Line No.',
+        this.order.lane,
+        '',
+        'BUYER:',
+        this.order.buyer,
+        '',
+        'ORDER QTY :',
+        this.order.orderQuantity,
+      ],
+      [
+        'STYLE NO. :',
+        this.order.styleNo,
+        '',
+        'FABRIC :',
+        this.order.fabric,
+        '',
+        'Daily Target',
+        this.order.target,
+      ],
+      [
+        'ITEM NO :',
+        this.order.itemNo,
+        '',
+        'DIVISION:',
+        this.order.division,
+        '',
+        'Efficiency',
+        `${this.order.efficiency}%`,
+      ],
+      [
+        'DESC :',
+        this.order.description,
+        '',
+        'Created By:',
+        this.order.createdBy,
+        '',
+        'Line design',
+        this.order.lineDesign,
+      ],
+      [], // Blank row to separate headers
+    ];
+
+    const operationHeaders = [
+      'Sl. No.',
+      'Operation',
+      'Section',
+      'M/C Type',
+      'Standard Minute',
+      'Required',
+      'Allocated',
+      'Achieved Target',
+    ];
+
+    const operationData = this.order.operations.map((op, index) => [
+      index + 1,
+      op.operationName,
+      op.section,
+      op.machineType,
+      op.sam,
+      op.required,
+      op.allocated,
+      op.target,
+    ]);
+
+    const summaryRow = [
+      '',
+      'Total',
+      '',
+      '',
+      this.order.totalSam,
+      this.order.totalRequired,
+      this.order.totalAllocation,
+      this.order.designOutput,
+    ];
+
+    const finalData = [
+      ...headerRows,
+      operationHeaders,
+      ...operationData,
+      summaryRow,
+    ];
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(finalData);
+
+    worksheet['!cols'] = [
+      { wch: 8 }, // Sl. No.
+      { wch: 25 }, // Operation
+      { wch: 20 }, // Section
+      { wch: 15 }, // M/C Type
+      { wch: 18 }, // Standard Minute
+      { wch: 12 }, // Required
+      { wch: 10 }, // Allocated
+      { wch: 18 }, // Achieved Target
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Order Details');
+
+    const excelBuffer: any = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+
+    const fileData: Blob = new Blob([excelBuffer], {
+      type: 'application/octet-stream',
+    });
+
+    FileSaver.saveAs(fileData, `${this.order.styleNo}_OrderDetails.xlsx`);
   }
 
   goToDesign(): void {
     this.router.navigate(['/table', this.styleNo]);
+  }
+  back(): void {
+    this.router.navigate(['/orders']);
   }
 }

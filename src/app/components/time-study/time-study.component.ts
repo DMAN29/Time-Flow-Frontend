@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../service/order.service';
 import { TimeStudyService } from '../../service/time-study.service';
-import { Operation } from '../../model/Order';
+import { Operation, Order } from '../../model/Order';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +16,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AddOperatorComponent } from './add-operator/add-operator.component';
 import { AddRemarksComponent } from './add-remarks/add-remarks.component';
 import { TimeStudy } from '../../model/TimeStudy';
+
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-time-study',
@@ -46,6 +49,8 @@ export class TimeStudyComponent implements OnInit {
   lapsHeaders: string[] = [];
   canEditLaps: boolean = true;
 
+  order: Order | null = null;
+
   tempAllowance: number = 0;
   tempLaps: number = 10;
 
@@ -65,6 +70,7 @@ export class TimeStudyComponent implements OnInit {
 
     this.orderService.getOrderByStyleNo(styleNo).subscribe({
       next: (res) => {
+        this.order = res;
         this.operations = res.operations;
         this.laneNo = res.lane;
         this.allowance = res.allowance ?? 0;
@@ -375,5 +381,114 @@ export class TimeStudyComponent implements OnInit {
         });
       }
     });
+  }
+
+  downloadExcel(): void {
+    if (!this.order) {
+      alert('Order data not loaded yet.');
+      return;
+    }
+    const workbook = XLSX.utils.book_new();
+
+    const header = [
+      ['Line No.', this.laneNo, '', 'BUYER:', this.order?.buyer, ''],
+      [
+        'STYLE NO. :',
+        this.order?.styleNo,
+        '',
+        'FABRIC :',
+        this.order?.fabric,
+        '',
+      ],
+      [
+        'ITEM NO :',
+        this.order?.itemNo,
+        '',
+        'DIVISION:',
+        this.order?.division,
+        '',
+      ],
+      [
+        'DESC :',
+        this.order?.description,
+        '',
+        'Created By:',
+        this.order?.createdBy,
+        '',
+      ],
+    ];
+
+    const tableHeaders = [
+      'S.No',
+      'Operation Name',
+      'Section',
+      'Operator ID',
+      'Operator Name',
+      ...this.lapsHeaders,
+      'Avg',
+      `Allowance ${this.allowance}%`,
+      'Cap/Hr',
+      'Cap/Day',
+      'Remarks',
+    ];
+
+    const tableData: any[][] = [];
+
+    this.groupedOperations.forEach((group, groupIndex) => {
+      group.rows.forEach((row) => {
+        tableData.push([
+          groupIndex + 1,
+          row.operationName,
+          row.section,
+          row.operatorId,
+          row.operatorName,
+          ...row.laps,
+          row.avg,
+          row.allowance,
+          row.capacityPH,
+          row.capacityPD,
+          row.remarks || '',
+        ]);
+      });
+    });
+
+    const worksheet = XLSX.utils.aoa_to_sheet([
+      ...header,
+      [],
+      tableHeaders,
+      ...tableData,
+    ]);
+
+    // Column width adjustments
+    worksheet['!cols'] = [
+      { wch: 6 }, // S.No
+      { wch: 25 }, // Operation Name
+      { wch: 15 }, // Section
+      { wch: 15 }, // Operator ID
+      { wch: 18 }, // Operator Name
+      ...Array(this.lapsHeaders.length).fill({ wch: 10 }), // Laps
+      { wch: 12 }, // Avg
+      { wch: 15 }, // Allowance
+      { wch: 12 }, // Cap/Hr
+      { wch: 12 }, // Cap/Day
+      { wch: 20 }, // Remarks
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Time Study');
+
+    const excelBuffer: any = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+
+    const fileData: Blob = new Blob([excelBuffer], {
+      type: 'application/octet-stream',
+    });
+
+    FileSaver.saveAs(fileData, `TimeStudy_Line${this.laneNo}.xlsx`);
+  }
+
+  back(): void {
+    this.router.navigate(['/orders']);
   }
 }

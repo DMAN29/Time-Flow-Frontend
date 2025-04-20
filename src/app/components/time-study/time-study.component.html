@@ -1,5 +1,17 @@
-<!-- Outer container for spacing -->
 <div class="p-4 md:px-12 max-w-full overflow-x-auto">
+  <div class="flex justify-between">
+    <button *ngIf="order" mat-stroked-button color="warn" (click)="back()">
+      Back
+    </button>
+    <button
+      *ngIf="order"
+      mat-stroked-button
+      color="primary"
+      (click)="downloadExcel()"
+    >
+      Download Excel
+    </button>
+  </div>
   <!-- Header -->
   <div class="text-2xl font-bold text-center mb-6">
     TIME STUDY (Line - {{ laneNo }})
