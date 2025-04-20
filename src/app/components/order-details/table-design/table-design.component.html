@@ -1,68 +1,76 @@
-<div class="p-6 w-[75%] mx-auto relative">
+<div class="w-[80%] mx-auto p-6">
   <h2 class="text-xl font-bold text-gray-800 mb-6">
     Operation Allocation Layout
   </h2>
 
-  <!-- Two Column Grid -->
-  <div class="grid grid-cols-2 gap-y-4 gap-x-6 w-[70%]">
-    <ng-container *ngFor="let pair of displayedBlocks">
-      <!-- Right Column Block (Image Left, Text Right) -->
-      <div
-        *ngIf="pair.right"
-        class="w-[350px] h-[100px] flex items-center justify-between text-white px-4 py-2 rounded shadow-md"
-        [ngStyle]="{ 'background-color': getColor(pair.right.section) }"
-      >
-        <img
-          src="/images/person.webp"
-          alt="Person"
-          class="h-[80%] object-contain"
-        />
-        <div class="text-lg font-bold text-black text-right w-[60%]">
-          <ng-container
-            *ngFor="let op of pair.right.operations; let last = last"
-            >{{ op.id }}. {{ op.operationName }}<br *ngIf="!last" />
-          </ng-container>
-        </div>
-      </div>
-
-      <!-- Left Column Block (Text Left, Image Right) -->
-      <div
-        *ngIf="pair.left"
-        class="w-[350px] h-[100px] flex items-center justify-between text-white px-4 py-2 rounded shadow-md"
-        [ngStyle]="{ 'background-color': getColor(pair.left.section) }"
-      >
-        <div class="text-lg font-bold text-black w-[60%]">
-          <ng-container
-            *ngFor="let op of pair.left.operations; let last = last"
+  <!-- Grid: 2/3 (content) and 1/3 (sticky legend) -->
+  <div class="grid grid-cols-3 gap-6">
+    <!-- Left 2/3 -->
+    <div class="col-span-2">
+      <div class="grid grid-cols-2 gap-y-4 gap-x-6">
+        <ng-container *ngFor="let pair of displayedBlocks">
+          <!-- Right Column Block -->
+          <div
+            *ngIf="pair.right"
+            class="w-[350px] h-[100px] flex items-center justify-between text-white px-4 py-2 rounded shadow-md"
+            [ngStyle]="{ 'background-color': getColor(pair.right.section) }"
           >
-            {{ op.id }}. {{ op.operationName }}<br *ngIf="!last" />
-          </ng-container>
-        </div>
-        <img
-          src="/images/person.webp"
-          alt="Person"
-          class="h-[80%] object-contain"
-        />
-      </div>
-    </ng-container>
-  </div>
+            <img
+              src="/images/person.webp"
+              alt="Person"
+              class="h-[80%] object-contain"
+            />
+            <div class="text-lg font-bold text-black text-right w-[60%]">
+              <ng-container
+                *ngFor="let op of pair.right.operations; let last = last"
+              >
+                {{ op.id }}. {{ op.operationName }}<br *ngIf="!last" />
+              </ng-container>
+            </div>
+          </div>
 
-  <!-- Fixed Legend -->
-  <div class="fixed right-[20%] top-[20%] bg-white p-4 rounded shadow-lg z-50">
-    <h3 class="text-6xl font-semibold mb-2">Legend</h3>
-    <div class="flex flex-col gap-2">
-      <div
-        *ngFor="let sec of sectionKeys"
-        class="px-10 py-2 rounded text-gray-600 text-xl font-medium text-center"
-        [ngStyle]="{ 'background-color': getColor(sec) }"
-      >
-        {{ sec }}
+          <!-- Left Column Block -->
+          <div
+            *ngIf="pair.left"
+            class="w-[350px] h-[100px] flex items-center justify-between text-white px-4 py-2 rounded shadow-md"
+            [ngStyle]="{ 'background-color': getColor(pair.left.section) }"
+          >
+            <div class="text-lg font-bold text-black w-[60%]">
+              <ng-container
+                *ngFor="let op of pair.left.operations; let last = last"
+              >
+                {{ op.id }}. {{ op.operationName }}<br *ngIf="!last" />
+              </ng-container>
+            </div>
+            <img
+              src="/images/person.webp"
+              alt="Person"
+              class="h-[80%] object-contain"
+            />
+          </div>
+        </ng-container>
       </div>
-      <img
-        src="/images/person.webp"
-        alt="Person"
-        class="h-[80%] object-contain"
-      />
+    </div>
+
+    <!-- Right 1/3: Sticky Legend -->
+    <div class="sticky top-40 self-start bg-white p-4 rounded shadow-lg h-fit">
+      <h3 class="text-2xl font-semibold mb-2">Legend</h3>
+      <div class="flex flex-col gap-2">
+        <div
+          *ngFor="let sec of sectionKeys"
+          class="px-6 py-2 rounded text-gray-600 text-lg font-medium text-center"
+          [ngStyle]="{ 'background-color': getColor(sec) }"
+        >
+          {{ sec }}
+        </div>
+        <div class="mt-4 text-center">
+          <img
+            src="/images/person.webp"
+            alt="Person"
+            class="h-16 mx-auto object-contain"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </div>
