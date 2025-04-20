@@ -104,6 +104,7 @@ export class OrderDetailsComponent implements OnInit {
 
     const workbook: XLSX.WorkBook = XLSX.utils.book_new();
 
+    // Header section
     const headerRows = [
       [
         'Line No.',
@@ -145,9 +146,10 @@ export class OrderDetailsComponent implements OnInit {
         'Line design',
         this.order.lineDesign,
       ],
-      [], // Blank row to separate headers
+      [],
     ];
 
+    // Operations table
     const operationHeaders = [
       'Sl. No.',
       'Operation',
@@ -158,7 +160,6 @@ export class OrderDetailsComponent implements OnInit {
       'Allocated',
       'Achieved Target',
     ];
-
     const operationData = this.order.operations.map((op, index) => [
       index + 1,
       op.operationName,
@@ -181,19 +182,35 @@ export class OrderDetailsComponent implements OnInit {
       this.order.designOutput,
     ];
 
+    // Machine Allocation Summary
+    const machineSummaryHeader = [];
+    const machineSummaryTitle = [[''], ['Machine Allocation Summary'], []]; // empty row above and below
+    const machineSummaryHeaders = [['S.No', 'Machine', 'Allocated']];
+    const machineSummaryData = this.machineSummary.map((m, i) => [
+      i + 1,
+      m.machineType,
+      m.count,
+    ]);
+
+    // Combine all sections
     const finalData = [
       ...headerRows,
       operationHeaders,
       ...operationData,
       summaryRow,
+      [],
+      ...machineSummaryTitle,
+      ...machineSummaryHeaders,
+      ...machineSummaryData,
     ];
 
+    // Create worksheet
     const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(finalData);
 
     worksheet['!cols'] = [
       { wch: 8 }, // Sl. No.
-      { wch: 25 }, // Operation
-      { wch: 20 }, // Section
+      { wch: 25 }, // Operation / Machine
+      { wch: 20 }, // Section / Allocated
       { wch: 15 }, // M/C Type
       { wch: 18 }, // Standard Minute
       { wch: 12 }, // Required
@@ -207,11 +224,9 @@ export class OrderDetailsComponent implements OnInit {
       bookType: 'xlsx',
       type: 'array',
     });
-
     const fileData: Blob = new Blob([excelBuffer], {
       type: 'application/octet-stream',
     });
-
     FileSaver.saveAs(fileData, `${this.order.styleNo}_OrderDetails.xlsx`);
   }
 
