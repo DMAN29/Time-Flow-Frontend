@@ -49,7 +49,7 @@ export class SignUpComponent {
     private companyService: CompanyService
   ) {
     this.signUpForm = this.fb.group({
-      company: ['', Validators.required], // ⬅️ new field
+      company: [''], // ⬅️ new field
       userId: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
