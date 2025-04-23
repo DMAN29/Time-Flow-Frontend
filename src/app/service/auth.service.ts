@@ -29,5 +29,9 @@ export class AuthService {
   }
   logout(): void {
     localStorage.removeItem('token'); // or whatever key you store the token in
+    localStorage.removeItem('email');
+  }
+  getCurrentUserEmail(): string {
+    return localStorage.getItem('email') || '';
   }
 }

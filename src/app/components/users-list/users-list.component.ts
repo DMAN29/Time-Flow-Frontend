@@ -43,6 +43,7 @@ export class UsersListComponent implements OnInit {
     'role',
     'createdAt',
     'update',
+    'pause', // ⬅️ Add this line
     'delete',
   ];
 
@@ -120,6 +121,41 @@ export class UsersListComponent implements OnInit {
           this.loadUsers();
         },
         error: (err) => console.error('Error deleting user:', err),
+      });
+    }
+  }
+  canPause(user: User): boolean {
+    // ✅ Already paused
+    if (user.role.length === 0) return false;
+
+    const isAdmin = user.role.includes('ROLE_ADMIN');
+    const isUser = user.role.includes('ROLE_USER');
+    const isHead = user.role.includes('ROLE_HEAD');
+
+    // ✅ HEAD can pause ADMIN and USER (not HEADs)
+    if (this.loggedInRoles.includes('ROLE_HEAD')) {
+      return !isHead;
+    }
+
+    // ✅ ADMIN can pause only USER (not ADMIN or HEAD)
+    if (this.loggedInRoles.includes('ROLE_ADMIN')) {
+      return isUser && !isAdmin && !isHead;
+    }
+
+    return false;
+  }
+
+  pauseRole(user: User): void {
+    if (confirm(`Pause all roles for ${user.email}?`)) {
+      this.userService.pauseUserRole(user.email).subscribe({
+        next: () => {
+          alert(`Roles paused for ${user.email}`);
+          this.loadUsers();
+        },
+        error: (err) => {
+          console.error('Error pausing role:', err);
+          alert('Failed to pause roles.');
+        },
       });
     }
   }

@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Operation, Order } from '../../../model/Order';
 import { OrderService } from '../../../service/order.service';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-table-design',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatButton],
   templateUrl: './table-design.component.html',
   styleUrls: ['./table-design.component.css'],
 })
@@ -45,7 +46,8 @@ export class TableDesignComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -124,5 +126,8 @@ export class TableDesignComponent implements OnInit {
 
   getColor(section: string): string {
     return this.sectionColors[section] || '#666';
+  }
+  goBack(): void {
+    this.location.back(); // Navigates one step back in browser history
   }
 }

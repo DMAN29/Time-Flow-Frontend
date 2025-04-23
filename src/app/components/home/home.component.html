@@ -1,0 +1,72 @@
+<div class="relative p-10">
+  <!-- 📌 Top-right Sample OB image -->
+  <div class="absolute top-10 right-10 hidden lg:block">
+    <img
+      src="/assets/Sample.jpg"
+      alt="Sample OB"
+      class="h-[600px] object-contain rounded border"
+    />
+    <div class="mt-3 text-right">
+      <button
+        mat-raised-button
+        color="primary"
+        class="flex items-center gap-2"
+        (click)="downloadSampleOB()"
+      >
+        <mat-icon>download</mat-icon>
+        Download Sample OB
+      </button>
+    </div>
+  </div>
+
+  <ng-container *ngIf="userRoles.length === 0; else content">
+    <div class="flex justify-center items-center h-[70vh]">
+      <p class="text-2xl font-semibold text-gray-700 text-center">
+        Your account is not active yet.<br />
+        Please wait or contact higher authorities to activate your account.
+      </p>
+    </div>
+  </ng-container>
+
+  <ng-template #content>
+    <!-- Logo + Title -->
+    <div class="flex items-center gap-6 mb-12">
+      <img src="/assets/logo.png" alt="logo" class="h-32" />
+      <h1 class="text-5xl font-extrabold tracking-wide text-gray-800">
+        SAM-sync
+      </h1>
+    </div>
+
+    <!-- User Guide -->
+    <h2 class="text-4xl font-bold mb-8 text-gray-800">User Guide</h2>
+
+    <div
+      class="bg-gray-100 p-8 rounded-xl shadow w-full lg:w-[65%] space-y-5 text-[17px] leading-relaxed text-gray-800 font-medium"
+    >
+      <p>
+        📋 <strong>Add New Order:</strong> Use the "Add Order" page to submit
+        details like style number, buyer, and item information.
+      </p>
+      <p>
+        📥 <strong>Upload OB Excel:</strong> Upload your operation breakdown
+        Excel file in the supported format.
+      </p>
+      <p>
+        📈 <strong>View Calculations:</strong> The system computes SAM,
+        efficiency, and target metrics instantly.
+      </p>
+      <p>
+        🛠️ <strong>Machine Allocation:</strong> Visualize the machine
+        distribution and section-wise breakdown.
+      </p>
+      <p>
+        ⏱️ <strong>Time Study:</strong> Conduct lap-based performance studies
+        for each operation.
+      </p>
+      <p>
+        📤 <strong>Export OB:</strong> Download an updated Excel file of the
+        final OB summary.
+      </p>
+    </div>
+  </ng-template>
+</div>

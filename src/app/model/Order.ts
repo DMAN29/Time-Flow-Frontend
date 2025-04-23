@@ -47,3 +47,13 @@ export interface Operation {
   allocated: number;
   target: number;
 }
+
+export interface TargetRequest {
+  styleNo: string;
+  target: number;
+}
+
+export interface EfficiencyRequest {
+  styleNo: string;
+  efficiency: number;
+}

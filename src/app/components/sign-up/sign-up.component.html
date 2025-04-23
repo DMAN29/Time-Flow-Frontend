@@ -144,8 +144,13 @@
       </div>
 
       <!-- Submit Button -->
-      <button mat-raised-button color="primary" class="w-full" type="submit">
-        Create Account
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSubmit()"
+        [disabled]="isSubmitting || signUpForm.invalid"
+      >
+        {{ isSubmitting ? "Creating..." : "Create Account" }}
       </button>
     </form>
 

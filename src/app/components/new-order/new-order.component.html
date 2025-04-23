@@ -206,8 +206,14 @@
       </mat-error>
     </div>
 
-    <button mat-raised-button color="primary" class="w-full mt-6" type="submit">
-      Submit Order
+    <button
+      mat-raised-button
+      color="primary"
+      class="w-full mt-6"
+      type="submit"
+      [disabled]="isSubmitting"
+    >
+      {{ isSubmitting ? "Submitting..." : "Submit Order" }}
     </button>
   </form>
 </div>

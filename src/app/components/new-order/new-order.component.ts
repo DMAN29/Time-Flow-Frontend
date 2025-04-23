@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatIcon } from '@angular/material/icon';
 import { MatError } from '@angular/material/form-field';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-new-order',
@@ -30,11 +31,13 @@ import { MatError } from '@angular/material/form-field';
 export class NewOrderComponent {
   orderForm: FormGroup;
   selectedFile: File | null = null;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
     private orderService: OrderService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {
     this.orderForm = this.fb.group({
       styleNo: ['', Validators.required],
@@ -112,9 +115,10 @@ export class NewOrderComponent {
   }
 
   onSubmit(): void {
-    if (this.orderForm.valid) {
-      const raw = this.orderForm.value;
+    if (this.orderForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
 
+      const raw = this.orderForm.value;
       const sanitizedOrder = {
         styleNo: raw.styleNo.trim(),
         itemNo: raw.itemNo.trim(),
@@ -137,15 +141,32 @@ export class NewOrderComponent {
 
       this.orderService.createOrder(formData).subscribe({
         next: (res: Order) => {
-          alert('Order created successfully!');
-          console.log('Order created:', res);
+          this.snackBar.open('Order created successfully!', 'Close', {
+            duration: 3000,
+            verticalPosition: 'top',
+            panelClass: ['snackbar-success'],
+          });
+
           this.orderForm.reset();
           this.selectedFile = null;
-          this.router.navigate(['/orders']);
+          this.isSubmitting = false;
+          this.router.navigate(['/order', res.styleNo]);
         },
         error: (err) => {
           console.error('Error creating order:', err);
-          alert('Failed to create order. Try again.');
+
+          const backendMessage =
+            err?.error && typeof err.error === 'string'
+              ? err.error
+              : 'Failed to create order. Try again.';
+
+          this.snackBar.open(backendMessage, 'Close', {
+            duration: 3000,
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error'],
+          });
+
+          this.isSubmitting = false;
         },
       });
     } else {

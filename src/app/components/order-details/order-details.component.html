@@ -48,14 +48,45 @@
       <strong>Order Quantity: &nbsp;</strong>
       <span class="text-gray-700">{{ order?.orderQuantity | number }}</span>
     </div>
-    <div class="bg-white p-4 rounded shadow text-sm">
-      <strong>Target: &nbsp;</strong>
-      <span class="text-gray-700">{{ order?.target }}</span>
+
+    <!-- Editable Target -->
+    <div
+      class="bg-white p-4 rounded shadow text-sm flex justify-between items-center"
+    >
+      <div>
+        <strong>Target: &nbsp;</strong>
+        <span class="text-gray-700">{{ order?.target }}</span>
+      </div>
+      <button
+        *ngIf="order?.createdBy === loggedInEmail"
+        mat-icon-button
+        color="primary"
+        (click)="editTarget()"
+        matTooltip="Edit Target"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
     </div>
-    <div class="bg-white p-4 rounded shadow text-sm">
-      <strong>Efficiency: &nbsp;</strong>
-      <span class="text-gray-700">{{ order?.efficiency }}%</span>
+
+    <!-- Editable Efficiency -->
+    <div
+      class="bg-white p-4 rounded shadow text-sm flex justify-between items-center"
+    >
+      <div>
+        <strong>Efficiency: &nbsp;</strong>
+        <span class="text-gray-700">{{ order?.efficiency }}%</span>
+      </div>
+      <button
+        *ngIf="order?.createdBy === loggedInEmail"
+        mat-icon-button
+        color="primary"
+        (click)="editEfficiency()"
+        matTooltip="Edit Efficiency"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
     </div>
+
     <div class="bg-white p-4 rounded shadow text-sm">
       <strong>Design Output: &nbsp;</strong>
       <span class="text-gray-700">{{ order?.designOutput }}</span>
@@ -127,7 +158,14 @@
 
       <ng-container matColumnDef="target">
         <th mat-header-cell *matHeaderCellDef>Target</th>
-        <td mat-cell *matCellDef="let op">{{ op.target }}</td>
+        <td
+          mat-cell
+          *matCellDef="let op"
+          [ngClass]="getTargetInfo(op.target).color"
+          [matTooltip]="getTargetInfo(op.target).tooltip"
+        >
+          {{ op.target }}
+        </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

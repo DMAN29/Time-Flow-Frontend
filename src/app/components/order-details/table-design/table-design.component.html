@@ -1,5 +1,10 @@
 <div class="w-[80%] mx-auto p-6">
-  <h2 class="text-xl font-bold text-gray-800 mb-6">
+  <!-- Back Button -->
+  <div class="mb-4">
+    <button mat-stroked-button color="warn" (click)="goBack()">Back</button>
+  </div>
+
+  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
     Operation Allocation Layout
   </h2>
 
@@ -16,7 +21,7 @@
             [ngStyle]="{ 'background-color': getColor(pair.right.section) }"
           >
             <img
-              src="/images/person.webp"
+              src="/assets/person.webp"
               alt="Person"
               class="h-[80%] object-contain"
             />
@@ -43,7 +48,7 @@
               </ng-container>
             </div>
             <img
-              src="/images/person.webp"
+              src="/assets/person.webp"
               alt="Person"
               class="h-[80%] object-contain"
             />
@@ -65,7 +70,7 @@
         </div>
         <div class="mt-4 text-center">
           <img
-            src="/images/person.webp"
+            src="/assets/person.webp"
             alt="Person"
             class="h-16 mx-auto object-contain"
           />

@@ -4,9 +4,11 @@ import { Observable } from 'rxjs';
 import { BASE_URL, getAuthHeaders } from './base-url';
 import {
   AllowanceRequest,
+  EfficiencyRequest,
   LaneRequest,
   LapsCountRequest,
   Order,
+  TargetRequest,
 } from '../model/Order';
 import { ApiResponse } from '../model/ApiResponse';
 
@@ -33,7 +35,7 @@ export class OrderService {
   // Get Order by Style Number
   getOrderByStyleNo(styleNo: string): Observable<Order> {
     return this.http.get<Order>(
-      `${this.URL}/style/${styleNo}`,
+      `${this.URL}/style/${encodeURIComponent(styleNo)}`,
       getAuthHeaders()
     );
   }
@@ -81,6 +83,24 @@ export class OrderService {
     // const token = localStorage.getItem('token') || '';
     return this.http.delete<ApiResponse>(
       `${this.URL}/delete/${styleNo}`,
+      getAuthHeaders()
+    );
+  }
+
+  // Update Target
+  updateTarget(target: TargetRequest): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(
+      `${this.URL}/update/target`,
+      target,
+      getAuthHeaders()
+    );
+  }
+
+  // Update Efficiency
+  updateEfficiency(efficiency: EfficiencyRequest): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(
+      `${this.URL}/update/efficiency`,
+      efficiency,
       getAuthHeaders()
     );
   }

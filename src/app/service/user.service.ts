@@ -50,4 +50,12 @@ export class UserService {
       getAuthHeaders()
     );
   }
+
+  pauseUserRole(email: string): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(
+      `${this.URL}/pause-role?email=${email}`,
+      {}, // empty body
+      getAuthHeaders()
+    );
+  }
 }

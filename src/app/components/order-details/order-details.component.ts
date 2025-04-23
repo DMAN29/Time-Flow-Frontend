@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../service/order.service';
+import { AuthService } from '../../service/auth.service';
 import { Operation, Order } from '../../model/Order';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -9,6 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { EditOrderValueComponent } from './edit-order-value/edit-order-value.component';
 
 @Component({
   selector: 'app-order-details',
@@ -19,6 +23,8 @@ import * as FileSaver from 'file-saver';
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltipModule,
+    MatDialogModule,
   ],
   templateUrl: './order-details.component.html',
   styleUrls: ['./order-details.component.css'],
@@ -26,10 +32,10 @@ import * as FileSaver from 'file-saver';
 export class OrderDetailsComponent implements OnInit {
   order: Order | null = null;
   styleNo: string = '';
+  loggedInEmail: string = '';
   dataSource = new MatTableDataSource<Operation>();
   machineSummary: { machineType: string; count: number }[] = [];
   machineDisplayedColumns: string[] = ['sno', 'machineType', 'count'];
-
   displayedColumns: string[] = [
     'id',
     'operationName',
@@ -42,20 +48,20 @@ export class OrderDetailsComponent implements OnInit {
   ];
 
   constructor(
-    private orderService: OrderService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private orderService: OrderService,
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    this.loggedInEmail = this.authService.getCurrentUserEmail();
     this.styleNo = this.route.snapshot.paramMap.get('styleNo') || '';
-
     if (this.styleNo) {
       this.orderService.getOrderByStyleNo(this.styleNo).subscribe({
         next: (res: Order) => {
           this.order = res;
-          console.log(this.order);
-
           const summary: Operation = {
             id: '',
             operationName: 'Total',
@@ -66,10 +72,8 @@ export class OrderDetailsComponent implements OnInit {
             allocated: res.totalAllocation ?? 0,
             target: res.designOutput,
           };
-
           const operationsWithSummary = [...(res.operations ?? []), summary];
           this.dataSource.data = operationsWithSummary;
-
           this.computeMachineSummary();
         },
         error: (err) => {
@@ -81,7 +85,6 @@ export class OrderDetailsComponent implements OnInit {
 
   computeMachineSummary(): void {
     const machineMap: { [key: string]: number } = {};
-
     this.order?.operations?.forEach((op) => {
       if (op.machineType) {
         if (!machineMap[op.machineType]) {
@@ -90,7 +93,6 @@ export class OrderDetailsComponent implements OnInit {
         machineMap[op.machineType] += op.allocated ?? 0;
       }
     });
-
     this.machineSummary = Object.entries(machineMap).map(
       ([machineType, count]) => ({
         machineType,
@@ -101,10 +103,37 @@ export class OrderDetailsComponent implements OnInit {
 
   downloadExcel(): void {
     if (!this.order) return;
-
     const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-
-    // Header section
+    const operationHeaders = [
+      'Sl. No.',
+      'Operation',
+      'Section',
+      'M/C Type',
+      'Standard Minute',
+      'Required',
+      'Allocated',
+      'Achieved Target',
+    ];
+    const operationData = this.order.operations.map((op, index) => [
+      index + 1,
+      op.operationName,
+      op.section,
+      op.machineType,
+      op.sam,
+      op.required,
+      op.allocated,
+      op.target,
+    ]);
+    const summaryRow = [
+      '',
+      'Total',
+      '',
+      '',
+      this.order.totalSam,
+      this.order.totalRequired,
+      this.order.totalAllocation,
+      this.order.designOutput,
+    ];
     const headerRows = [
       [
         'Line No.',
@@ -148,43 +177,7 @@ export class OrderDetailsComponent implements OnInit {
       ],
       [],
     ];
-
-    // Operations table
-    const operationHeaders = [
-      'Sl. No.',
-      'Operation',
-      'Section',
-      'M/C Type',
-      'Standard Minute',
-      'Required',
-      'Allocated',
-      'Achieved Target',
-    ];
-    const operationData = this.order.operations.map((op, index) => [
-      index + 1,
-      op.operationName,
-      op.section,
-      op.machineType,
-      op.sam,
-      op.required,
-      op.allocated,
-      op.target,
-    ]);
-
-    const summaryRow = [
-      '',
-      'Total',
-      '',
-      '',
-      this.order.totalSam,
-      this.order.totalRequired,
-      this.order.totalAllocation,
-      this.order.designOutput,
-    ];
-
-    // Machine Allocation Summary
-    const machineSummaryHeader = [];
-    const machineSummaryTitle = [[''], ['Machine Allocation Summary'], []]; // empty row above and below
+    const machineSummaryTitle = [[''], ['Machine Allocation Summary'], []];
     const machineSummaryHeaders = [['S.No', 'Machine', 'Allocated']];
     const machineSummaryData = this.machineSummary.map((m, i) => [
       i + 1,
@@ -192,7 +185,6 @@ export class OrderDetailsComponent implements OnInit {
       m.count,
     ]);
 
-    // Combine all sections
     const finalData = [
       ...headerRows,
       operationHeaders,
@@ -204,22 +196,9 @@ export class OrderDetailsComponent implements OnInit {
       ...machineSummaryData,
     ];
 
-    // Create worksheet
     const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(finalData);
-
-    worksheet['!cols'] = [
-      { wch: 8 }, // Sl. No.
-      { wch: 25 }, // Operation / Machine
-      { wch: 20 }, // Section / Allocated
-      { wch: 15 }, // M/C Type
-      { wch: 18 }, // Standard Minute
-      { wch: 12 }, // Required
-      { wch: 10 }, // Allocated
-      { wch: 18 }, // Achieved Target
-    ];
-
+    worksheet['!cols'] = new Array(8).fill({ wch: 20 });
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Order Details');
-
     const excelBuffer: any = XLSX.write(workbook, {
       bookType: 'xlsx',
       type: 'array',
@@ -233,7 +212,83 @@ export class OrderDetailsComponent implements OnInit {
   goToDesign(): void {
     this.router.navigate(['/table', this.styleNo]);
   }
+
   back(): void {
     this.router.navigate(['/orders']);
+  }
+
+  getTargetInfo(opTarget: number | undefined): {
+    color: string;
+    tooltip: string;
+  } {
+    if (!this.order || opTarget == null) return { color: '', tooltip: '' };
+    const orderTarget = this.order.target ?? 0;
+    const diff = opTarget - orderTarget;
+    const diffPercent = Math.round((diff / orderTarget) * 100);
+    if (Math.abs(diffPercent) <= 5)
+      return {
+        color: 'text-amber-500 font-semibold',
+        tooltip: 'Within expected target range',
+      };
+    if (diffPercent > 5 && diffPercent <= 25)
+      return {
+        color: 'text-emerald-600 font-semibold',
+
+        tooltip: `Above target by ${diffPercent}%`,
+      };
+    if (diffPercent < -5 && diffPercent >= -25)
+      return {
+        color: 'text-emerald-600 font-semibold',
+        tooltip: `Below target by ${Math.abs(diffPercent)}%`,
+      };
+    if (diffPercent > 25)
+      return {
+        color: 'text-rose-500 font-semibold',
+        tooltip: `Significantly above target by ${diffPercent}%`,
+      };
+    return {
+      color: 'text-rose-500 font-semibold',
+      tooltip: `Significantly below target by ${Math.abs(diffPercent)}%`,
+    };
+  }
+
+  editTarget(): void {
+    if (!this.order) return;
+    const dialogRef = this.dialog.open(EditOrderValueComponent, {
+      width: '300px',
+      data: { value: this.order.target, label: 'Target' },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != null && result !== this.order?.target) {
+        this.orderService
+          .updateTarget({ styleNo: this.styleNo, target: result })
+          .subscribe({
+            next: () => {
+              this.order!.target = result;
+              this.ngOnInit(); // Refresh data
+            },
+          });
+      }
+    });
+  }
+
+  editEfficiency(): void {
+    if (!this.order) return;
+    const dialogRef = this.dialog.open(EditOrderValueComponent, {
+      width: '300px',
+      data: { value: this.order.efficiency, label: 'Efficiency' },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != null && result !== this.order?.efficiency) {
+        this.orderService
+          .updateEfficiency({ styleNo: this.styleNo, efficiency: result })
+          .subscribe({
+            next: () => {
+              this.order!.efficiency = result;
+              this.ngOnInit(); // Refresh data
+            },
+          });
+      }
+    });
   }
 }

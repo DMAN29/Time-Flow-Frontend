@@ -61,6 +61,7 @@ export class SignInComponent {
         next: (res: LoginResponse) => {
           console.log('Login successful', res.jwt);
           localStorage.setItem('token', res.jwt);
+          localStorage.setItem('email', res.email);
           this.router.navigate(['/']);
         },
         error: (err) => {

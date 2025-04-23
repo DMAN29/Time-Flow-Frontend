@@ -12,11 +12,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 import { AuthService } from '../../service/auth.service';
 import { User } from '../../model/User';
 import { CompanyService } from '../../service/company.service';
 import { Company } from '../../model/Company';
-import { MatOption, MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-signup',
@@ -40,16 +43,18 @@ export class SignUpComponent {
   signUpForm: FormGroup;
   showPassword = false;
   showConfirmPassword = false;
+  isSubmitting = false;
   companyList: Company[] = [];
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
-    private companyService: CompanyService
+    private companyService: CompanyService,
+    private snackBar: MatSnackBar
   ) {
     this.signUpForm = this.fb.group({
-      company: ['', Validators.required], // ⬅️ new field
+      company: ['', Validators.required],
       userId: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
@@ -70,11 +75,10 @@ export class SignUpComponent {
   }
 
   onSubmit(): void {
-    if (this.signUpForm.valid) {
+    if (this.signUpForm.valid && !this.isSubmitting) {
       const { password, confirmPassword } = this.signUpForm.value;
 
       if (password !== confirmPassword) {
-        // alert('Passwords Mismatch! Please try again.');
         this.signUpForm.get('confirmPassword')?.setErrors({ mismatch: true });
         return;
       }
@@ -87,15 +91,34 @@ export class SignUpComponent {
         password: this.signUpForm.value.password,
         company: this.signUpForm.value.company,
       };
-      console.log('New User:', newUser);
+
+      this.isSubmitting = true;
+
       this.authService.register(newUser).subscribe({
-        next: (res) => {
-          alert('Account created successfully. Please sign in.');
+        next: () => {
+          this.snackBar.open(
+            'Account created successfully. Please sign in.',
+            'Close',
+            {
+              duration: 3000,
+              panelClass: ['snackbar-success'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+            }
+          );
           this.router.navigate(['/sign-in']);
+          this.isSubmitting = false;
         },
         error: (err) => {
-          console.error('Registration failed:', err.error);
-          alert('Registration failed. Please try again.');
+          const backendError =
+            err?.error || 'Registration failed. Please try again.';
+          this.snackBar.open(backendError, 'Close', {
+            duration: 4000,
+            panelClass: ['snackbar-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+          });
+          this.isSubmitting = false;
         },
       });
     } else {
