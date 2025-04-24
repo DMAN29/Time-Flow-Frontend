@@ -18,7 +18,7 @@
     <h2 class="text-xl font-bold text-gray-800">Order Summary</h2>
   </div>
 
-  <!-- Order Info -->
+  Order Info
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     <div class="bg-white p-4 rounded shadow text-sm">
       <strong>Style No: &nbsp;</strong>
@@ -106,7 +106,29 @@
   </div>
 
   <!-- Operations Table Section -->
-  <h2 class="text-xl font-bold text-gray-800 mt-6">Operations Breakdown</h2>
+  <!-- Section header and legend side-by-side -->
+  <div class="flex justify-between items-center mt-6 flex-wrap gap-4">
+    <h2 class="text-xl font-bold text-gray-800">Operations Breakdown</h2>
+
+    <div class="bg-white p-4 border rounded-lg shadow-sm w-fit">
+      <h3 class="text-sm font-semibold mb-2">🎯 Target Color Guide</h3>
+      <ul class="space-y-1 text-xs">
+        <li class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+          <span class="text-gray-700">Yellow (±5%)</span> – Bottleneck ‼️
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>
+          <span class="text-gray-700">Green (±5% to 25%)</span> – Safe Zone 👍
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+          <span class="text-gray-700">Red (±25%+)</span> – Danger Zone ⛔️
+        </li>
+      </ul>
+    </div>
+  </div>
+
   <div class="overflow-auto rounded shadow-lg">
     <table
       mat-table

@@ -222,33 +222,46 @@ export class OrderDetailsComponent implements OnInit {
     tooltip: string;
   } {
     if (!this.order || opTarget == null) return { color: '', tooltip: '' };
+
     const orderTarget = this.order.target ?? 0;
     const diff = opTarget - orderTarget;
     const diffPercent = Math.round((diff / orderTarget) * 100);
-    if (Math.abs(diffPercent) <= 5)
+
+    // 🟡 Yellow: Within ±5% → Bottleneck
+    if (Math.abs(diffPercent) <= 5) {
       return {
         color: 'text-amber-500 font-semibold',
-        tooltip: 'Within expected target range',
+        tooltip: `Bottleneck ‼️`,
       };
-    if (diffPercent > 5 && diffPercent <= 25)
-      return {
-        color: 'text-emerald-600 font-semibold',
+    }
 
-        tooltip: `Above target by ${diffPercent}%`,
-      };
-    if (diffPercent < -5 && diffPercent >= -25)
+    // 🟢 Green: Between ±5% and ±25% → Safe Zone
+    if (diffPercent > 5 && diffPercent <= 25) {
       return {
         color: 'text-emerald-600 font-semibold',
-        tooltip: `Below target by ${Math.abs(diffPercent)}%`,
+        tooltip: `Safe Zone 👍`,
       };
-    if (diffPercent > 25)
+    }
+
+    if (diffPercent < -5 && diffPercent >= -25) {
+      return {
+        color: 'text-emerald-600 font-semibold',
+        tooltip: `Safe Zone 👍`,
+      };
+    }
+
+    // 🔴 Red: Above +25% → Danger Zone
+    if (diffPercent > 25) {
       return {
         color: 'text-rose-500 font-semibold',
-        tooltip: `Significantly above target by ${diffPercent}%`,
+        tooltip: `Danger Zone ⛔️`,
       };
+    }
+
+    // 🔴 Red: Below -25% → Danger Zone
     return {
       color: 'text-rose-500 font-semibold',
-      tooltip: `Significantly below target by ${Math.abs(diffPercent)}%`,
+      tooltip: `Danger Zone ⛔️`,
     };
   }
 
