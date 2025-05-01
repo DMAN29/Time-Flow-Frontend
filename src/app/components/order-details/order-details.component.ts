@@ -179,6 +179,7 @@ export class OrderDetailsComponent implements OnInit {
       ],
       [],
     ];
+    const operationSummaryTitle = [[''], ['Operations Summary'], []];
     const machineSummaryTitle = [[''], ['Machine Allocation Summary'], []];
     const machineSummaryHeaders = [['S.No', 'Machine', 'Allocated']];
     const machineSummaryData = this.machineSummary.map((m, i) => [
@@ -189,6 +190,7 @@ export class OrderDetailsComponent implements OnInit {
 
     const finalData = [
       ...headerRows,
+      ...operationSummaryTitle,
       operationHeaders,
       ...operationData,
       summaryRow,

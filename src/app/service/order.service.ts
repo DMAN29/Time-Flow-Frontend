@@ -22,7 +22,7 @@ export class OrderService {
 
   // Create Order
   createOrder(order: any): Observable<Order> {
-    console.log('Creating order:', order); // 👈 console log here
+    // console.log('Creating order:', order); // 👈 console log here
 
     return this.http.post<Order>(`${this.URL}`, order, getAuthHeaders());
   }

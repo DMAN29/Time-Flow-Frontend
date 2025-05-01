@@ -16,7 +16,6 @@ export class AuthService {
 
   // 🔐 Login (expects jwt + message)
   login(user: User): Observable<LoginResponse> {
-    console.log(this.URL);
     return this.http.post<LoginResponse>(`${this.URL}/login`, user);
   }
 
