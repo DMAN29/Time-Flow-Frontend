@@ -18,7 +18,17 @@
   </div>
 
   <!-- Table -->
-  <div class="overflow-auto rounded shadow-md">
+  <div
+    *ngIf="filteredOrders.length === 0"
+    class="text-center text-gray-600 py-10"
+  >
+    <p class="text-lg">No orders yet.</p>
+  </div>
+
+  <div
+    *ngIf="filteredOrders.length > 0"
+    class="overflow-auto rounded shadow-md"
+  >
     <table
       mat-table
       [dataSource]="filteredOrders"
