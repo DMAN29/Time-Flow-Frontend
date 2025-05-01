@@ -147,10 +147,23 @@
       <button
         mat-raised-button
         color="primary"
-        (click)="onSubmit()"
+        class="w-full flex items-center justify-center gap-2"
+        type="submit"
         [disabled]="isSubmitting || signUpForm.invalid"
       >
-        {{ isSubmitting ? "Creating..." : "Create Account" }}
+        <mat-progress-spinner
+          *ngIf="isSubmitting"
+          diameter="20"
+          mode="indeterminate"
+          color="accent"
+          strokeWidth="3"
+          class="!inline-block !align-middle"
+          [style.width.px]="20"
+          [style.height.px]="20"
+        ></mat-progress-spinner>
+        <span>
+          {{ isSubmitting ? "Creating account..." : "Create Account" }}
+        </span>
       </button>
     </form>
 

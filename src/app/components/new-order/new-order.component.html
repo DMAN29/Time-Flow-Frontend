@@ -209,11 +209,23 @@
     <button
       mat-raised-button
       color="primary"
-      class="w-full mt-6"
+      class="w-full mt-6 flex items-center justify-center gap-2"
       type="submit"
       [disabled]="isSubmitting"
     >
-      {{ isSubmitting ? "Submitting..." : "Submit Order" }}
+      <mat-progress-spinner
+        *ngIf="isSubmitting"
+        diameter="20"
+        mode="indeterminate"
+        color="accent"
+        strokeWidth="3"
+        class="!inline-block !align-middle"
+        [style.width.px]="20"
+        [style.height.px]="20"
+      ></mat-progress-spinner>
+      <span>
+        {{ isSubmitting ? "Submitting..." : "Submit Order" }}
+      </span>
     </button>
   </form>
 </div>

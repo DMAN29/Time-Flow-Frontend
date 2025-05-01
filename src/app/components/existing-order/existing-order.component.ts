@@ -11,6 +11,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { UserService } from '../../service/user.service';
 import { ApiResponse } from '../../model/ApiResponse';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-existing-order',
@@ -52,7 +53,8 @@ export class ExistingOrderComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +110,19 @@ export class ExistingOrderComponent implements OnInit {
       this.orderService.deleteOrder(styleNo).subscribe({
         next: (res: ApiResponse) => {
           console.log('✅', res.message);
+
+          // ✅ Show success snackbar
+          this.snackBar.open(
+            res.message || 'Order deleted successfully.',
+            'Close',
+            {
+              duration: 3000,
+              panelClass: ['snackbar-success'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+            }
+          );
+
           // Remove from UI
           this.filteredOrders = this.filteredOrders.filter(
             (order) => order.styleNo !== styleNo

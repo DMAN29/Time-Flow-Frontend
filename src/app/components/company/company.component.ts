@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-company',
@@ -32,7 +33,10 @@ export class CompanyComponent implements OnInit {
   newCompanyName: string = '';
   isLoading = false;
   companyUsage: { [key: string]: boolean } = {};
-  constructor(private companyService: CompanyService) {}
+  constructor(
+    private companyService: CompanyService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.loadCompanies();
@@ -56,13 +60,24 @@ export class CompanyComponent implements OnInit {
     if (!name) return;
 
     this.companyService.addCompany({ name }).subscribe({
-      next: () => {
+      next: (res) => {
         this.newCompanyName = '';
+        this.snackBar.open(`Company ${res.name} added successfully!`, 'Close', {
+          duration: 3000,
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        });
         this.loadCompanies();
       },
       error: (err) => {
         console.error('Error adding company:', err.error);
-        alert(`Failed to add company. \n${err.error}`);
+        this.snackBar.open(`Failed to add company. ${err.error}`, 'Close', {
+          duration: 3000,
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        });
       },
     });
   }
@@ -70,10 +85,23 @@ export class CompanyComponent implements OnInit {
   deleteCompany(name: string): void {
     if (confirm(`Are you sure you want to delete "${name}"?`)) {
       this.companyService.deleteCompany(name).subscribe({
-        next: () => this.loadCompanies(),
+        next: (res) => {
+          this.snackBar.open(`${res.message}`, 'Close', {
+            duration: 3000,
+            panelClass: ['snackbar-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+          });
+          this.loadCompanies();
+        },
         error: (err) => {
           console.error('Error deleting company:', err);
-          alert('Failed to delete company.');
+          this.snackBar.open('Failed to delete company.', 'Close', {
+            duration: 3000,
+            panelClass: ['snackbar-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+          });
         },
       });
     }

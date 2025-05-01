@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIcon } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-users-list',
@@ -47,7 +48,10 @@ export class UsersListComponent implements OnInit {
     'delete',
   ];
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.userService.roles$.subscribe((roles) => {
@@ -102,13 +106,23 @@ export class UsersListComponent implements OnInit {
 
   updateRole(email: string, role: string): void {
     this.userService.changeUserRole(email, role).subscribe({
-      next: () => {
-        alert(`Role updated to ${role}`);
+      next: (res) => {
+        this.snackBar.open(`${res.message} to ${role}`, 'Close', {
+          duration: 3000,
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        });
         this.loadUsers();
       },
       error: (err) => {
         console.error('Error updating role:', err);
-        alert('Failed to update role.');
+        this.snackBar.open('Failed to update role.', 'Close', {
+          duration: 3000,
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        });
       },
     });
   }
@@ -117,9 +131,15 @@ export class UsersListComponent implements OnInit {
     if (confirm(`Are you sure you want to delete ${email}?`)) {
       this.userService.deleteUser(email).subscribe({
         next: () => {
-          alert('User deleted!');
+          this.snackBar.open('User deleted successfully!', 'Close', {
+            duration: 3000,
+            panelClass: ['snackbar-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+          });
           this.loadUsers();
         },
+
         error: (err) => console.error('Error deleting user:', err),
       });
     }
@@ -149,7 +169,12 @@ export class UsersListComponent implements OnInit {
     if (confirm(`Pause all roles for ${user.email}?`)) {
       this.userService.pauseUserRole(user.email).subscribe({
         next: () => {
-          alert(`Roles paused for ${user.email}`);
+          this.snackBar.open(`Roles paused for ${user.email}`, 'Close', {
+            duration: 3000,
+            panelClass: ['snackbar-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+          });
           this.loadUsers();
         },
         error: (err) => {

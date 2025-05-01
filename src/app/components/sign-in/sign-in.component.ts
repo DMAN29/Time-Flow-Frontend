@@ -17,6 +17,7 @@ import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../service/auth.service';
 import { User } from '../../model/User';
 import { LoginResponse } from '../../model/LoginResponse';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-signin',
@@ -30,6 +31,7 @@ import { LoginResponse } from '../../model/LoginResponse';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
+    MatProgressSpinner,
   ],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.css'],
@@ -37,6 +39,7 @@ import { LoginResponse } from '../../model/LoginResponse';
 export class SignInComponent {
   signInForm: FormGroup;
   showPassword = false;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -45,7 +48,7 @@ export class SignInComponent {
   ) {
     this.signInForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(2)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -55,20 +58,23 @@ export class SignInComponent {
 
   onSubmit(): void {
     if (this.signInForm.valid) {
+      this.isSubmitting = true;
+
       const loginData: User = this.signInForm.value;
 
       this.authService.login(loginData).subscribe({
         next: (res: LoginResponse) => {
-          console.log('Login successful', res.jwt);
           localStorage.setItem('token', res.jwt);
           localStorage.setItem('email', res.email);
           this.router.navigate(['/']);
+          this.isSubmitting = false;
         },
         error: (err) => {
           console.error('Login failed', err.error);
           alert(
             'Login failed. Please check your email and password and try again.'
           );
+          this.isSubmitting = false;
         },
       });
     } else {

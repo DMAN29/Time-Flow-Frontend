@@ -1,4 +1,10 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+  <!-- <app-loading
+    *ngIf="isSubmitting"
+    [message]="'Signing you in...'"
+    [spinnerSize]="70"
+  /> -->
+
   <mat-card class="w-full max-w-md p-6 rounded-lg shadow-lg bg-white">
     <h2 class="text-center text-2xl font-semibold text-gray-800 mb-6">
       Sign In
@@ -55,8 +61,26 @@
       </mat-form-field>
 
       <!-- Submit -->
-      <button mat-raised-button color="primary" class="w-full" type="submit">
-        Sign In
+      <button
+        mat-raised-button
+        color="primary"
+        class="w-full flex items-center justify-center gap-2"
+        type="submit"
+        [disabled]="isSubmitting || signInForm.invalid"
+      >
+        <mat-progress-spinner
+          *ngIf="isSubmitting"
+          diameter="20"
+          mode="indeterminate"
+          color="accent"
+          class="!inline-block !align-middle"
+          [style.width.px]="20"
+          [style.height.px]="20"
+          strokeWidth="3"
+        ></mat-progress-spinner>
+        <span>
+          {{ isSubmitting ? "Signing in..." : "Sign In" }}
+        </span>
       </button>
     </form>
 

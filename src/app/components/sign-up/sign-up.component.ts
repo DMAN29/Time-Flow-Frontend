@@ -20,6 +20,7 @@ import { AuthService } from '../../service/auth.service';
 import { User } from '../../model/User';
 import { CompanyService } from '../../service/company.service';
 import { Company } from '../../model/Company';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-signup',
@@ -34,6 +35,7 @@ import { Company } from '../../model/Company';
     MatIconModule,
     MatCardModule,
     MatOption,
+    MatProgressSpinner,
     MatSelectModule,
   ],
   templateUrl: './sign-up.component.html',

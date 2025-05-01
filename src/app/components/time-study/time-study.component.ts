@@ -19,6 +19,7 @@ import { TimeStudy } from '../../model/TimeStudy';
 
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-time-study',
@@ -61,7 +62,8 @@ export class TimeStudyComponent implements OnInit {
     private router: Router,
     private orderService: OrderService,
     private studyService: TimeStudyService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -187,6 +189,18 @@ export class TimeStudyComponent implements OnInit {
         .subscribe({
           next: (res) => {
             console.log('✅ Number of Laps updated:', res.message);
+
+            // ✅ Show snackbar
+            this.snackBar.open(
+              res.message || 'Number of laps updated.',
+              'Close',
+              {
+                duration: 3000,
+                panelClass: ['snackbar-success'],
+                horizontalPosition: 'center',
+                verticalPosition: 'top',
+              }
+            );
           },
           error: (err) => {
             console.error('❌ Failed to update laps', err);
@@ -207,6 +221,12 @@ export class TimeStudyComponent implements OnInit {
       .subscribe({
         next: (res) => {
           console.log('✅ Allowance updated:', res.message);
+          this.snackBar.open(res.message || 'Allowance updated.', 'Close', {
+            duration: 3000,
+            panelClass: ['snackbar-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+          });
 
           // ⬇️ Re-fetch order to get updated allowance & operations
           this.orderService.getOrderByStyleNo(styleNo).subscribe({

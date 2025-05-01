@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatIcon } from '@angular/material/icon';
 import { MatError } from '@angular/material/form-field';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-new-order',
@@ -26,6 +27,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatIconModule,
     MatIcon,
     MatError,
+    MatProgressSpinner,
   ],
 })
 export class NewOrderComponent {

@@ -13,6 +13,7 @@ import * as FileSaver from 'file-saver';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EditOrderValueComponent } from './edit-order-value/edit-order-value.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-order-details',
@@ -52,7 +53,8 @@ export class OrderDetailsComponent implements OnInit {
     private router: Router,
     private orderService: OrderService,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -276,9 +278,15 @@ export class OrderDetailsComponent implements OnInit {
         this.orderService
           .updateTarget({ styleNo: this.styleNo, target: result })
           .subscribe({
-            next: () => {
+            next: (res) => {
               this.order!.target = result;
-              this.ngOnInit(); // Refresh data
+              this.snackBar.open(res.message, 'Close', {
+                duration: 3000,
+                panelClass: ['snackbar-success'],
+                horizontalPosition: 'center',
+                verticalPosition: 'top',
+              });
+              this.ngOnInit();
             },
           });
       }
@@ -296,9 +304,15 @@ export class OrderDetailsComponent implements OnInit {
         this.orderService
           .updateEfficiency({ styleNo: this.styleNo, efficiency: result })
           .subscribe({
-            next: () => {
+            next: (res) => {
               this.order!.efficiency = result;
-              this.ngOnInit(); // Refresh data
+              this.snackBar.open(res.message, 'Close', {
+                duration: 3000,
+                panelClass: ['snackbar-success'],
+                horizontalPosition: 'center',
+                verticalPosition: 'top',
+              });
+              this.ngOnInit();
             },
           });
       }
