@@ -32,7 +32,6 @@ export class ExistingOrderComponent implements OnInit {
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   searchText: string = '';
-  // isAdmin: boolean = false;
   userRoles: string[] = [];
 
   displayedColumns: string[] = [
