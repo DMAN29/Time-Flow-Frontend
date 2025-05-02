@@ -5,6 +5,8 @@ import { Operation, Order } from '../../../model/Order';
 import { OrderService } from '../../../service/order.service';
 import { MatButton } from '@angular/material/button';
 
+type Block = { section: string; operations: Operation[] };
+
 @Component({
   selector: 'app-table-design',
   standalone: true,
@@ -18,7 +20,7 @@ export class TableDesignComponent implements OnInit {
   sectionColors: { [key: string]: string } = {};
   sectionKeys: string[] = [];
 
-  displayedBlocks: { left: any | null; right: any | null }[] = [];
+  displayedBlocks: { left: Block | null; right: Block | null }[] = [];
 
   private colorPalette: string[] = [
     '#A2CFFE',
@@ -64,12 +66,14 @@ export class TableDesignComponent implements OnInit {
   }
 
   prepareBlocks(operations: Operation[]): void {
-    const visualBlocks: { section: string; operations: Operation[] }[] = [];
-
+    const visualBlocks: Block[] = [];
     let i = 0;
+
     while (i < operations.length) {
       const current = operations[i];
       const currentSection = current.section;
+      const currentMachine = current.machineType;
+      const currentAllocated = current.allocated;
 
       if (!this.sectionColors[currentSection]) {
         this.sectionColors[currentSection] =
@@ -77,57 +81,80 @@ export class TableDesignComponent implements OnInit {
         this.colorIndex++;
       }
 
-      const block = {
-        section: currentSection,
-        operations: [current],
-      };
-
-      const next = operations[i + 1];
-
-      if (
-        next &&
-        next.section === currentSection &&
-        current.allocated === 0.5 &&
-        next.allocated === 0.5
-      ) {
-        block.operations.push(next);
-        visualBlocks.push(block);
-        i += 2;
-      } else if (
-        next &&
-        next.section === currentSection &&
-        current.allocated === 1.5 &&
-        next.allocated === 0.5
-      ) {
-        block.operations.push(next);
-        visualBlocks.push(block);
+      const fullBlocks = Math.floor(currentAllocated);
+      for (let j = 0; j < fullBlocks; j++) {
         visualBlocks.push({
           section: currentSection,
-          operations: [next],
+          operations: [current],
         });
-        i += 2;
-      } else {
-        visualBlocks.push(block);
-        i += 1;
       }
+
+      if (currentAllocated % 1 === 0.5) {
+        const next = operations[i + 1];
+        if (
+          next &&
+          next.section === currentSection &&
+          next.machineType === currentMachine &&
+          next.allocated % 1 === 0.5
+        ) {
+          visualBlocks.push({
+            section: currentSection,
+            operations: [current, next],
+          });
+
+          const nextFullBlocks = Math.floor(next.allocated);
+          for (let k = 0; k < nextFullBlocks; k++) {
+            visualBlocks.push({
+              section: next.section,
+              operations: [next],
+            });
+          }
+
+          i++; // skip next (already paired)
+        } else {
+          visualBlocks.push({
+            section: currentSection,
+            operations: [current],
+          });
+        }
+      }
+
+      i++;
     }
 
     this.sectionKeys = Object.keys(this.sectionColors);
 
-    // ⬇️ Bottom-up + Right-to-left: Reverse and push right-first
     const reversed = [...visualBlocks].reverse();
-    for (let j = 0; j < reversed.length; j += 2) {
+    const totalBlocks = reversed.length;
+
+    const workingList: Block[] = [...reversed];
+
+    // If odd, prepend a special empty block at the top-left
+    if (totalBlocks % 2 !== 0) {
+      workingList.unshift({
+        section: 'EMPTY',
+        operations: [],
+      });
+    }
+
+    this.displayedBlocks = [];
+
+    for (let j = 0; j < workingList.length; j += 2) {
       this.displayedBlocks.push({
-        right: reversed[j] || null,
-        left: reversed[j + 1] || null,
+        right: workingList[j] || null,
+        left: workingList[j + 1] || null,
       });
     }
   }
 
   getColor(section: string): string {
+    if (section === 'EMPTY') {
+      return 'transparent'; // or a light gray if you want to style the empty slot
+    }
     return this.sectionColors[section] || '#666';
   }
+
   goBack(): void {
-    this.location.back(); // Navigates one step back in browser history
+    this.location.back();
   }
 }
