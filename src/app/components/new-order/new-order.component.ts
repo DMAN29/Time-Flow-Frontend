@@ -1,5 +1,11 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ValidationErrors,
+} from '@angular/forms';
 import { OrderService } from '../../service/order.service';
 import { Order } from '../../model/Order';
 import { Router } from '@angular/router';
@@ -42,19 +48,19 @@ export class NewOrderComponent {
     private snackBar: MatSnackBar
   ) {
     this.orderForm = this.fb.group({
-      styleNo: ['', Validators.required],
-      itemNo: ['', Validators.required],
-      fabric: ['', Validators.required],
-      division: ['', Validators.required],
-      buyer: ['', Validators.required],
-      description: ['', Validators.required],
+      styleNo: ['', [Validators.required, this.noWhitespaceValidator]],
+      itemNo: ['', [Validators.required, this.noWhitespaceValidator]],
+      fabric: ['', [Validators.required, this.noWhitespaceValidator]],
+      division: ['', [Validators.required, this.noWhitespaceValidator]],
+      buyer: ['', [Validators.required, this.noWhitespaceValidator]],
+      description: ['', [Validators.required, this.noWhitespaceValidator]],
       orderQuantity: [null, [Validators.required, Validators.min(1)]],
       target: [null, [Validators.required, Validators.min(1)]],
       efficiency: [
         null,
         [Validators.required, Validators.min(1), Validators.max(100)],
       ],
-      line: [null, Validators.required],
+      line: [null, [Validators.required, Validators.min(1)]],
       file: [null, Validators.required],
     });
   }
@@ -63,28 +69,47 @@ export class NewOrderComponent {
     return this.orderForm.controls;
   }
 
-  // Format numbers with commas for display
+  noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
+    const value = (control.value || '').toString();
+    const isWhitespace = value.trim().length === 0;
+    return isWhitespace ? { required: true } : null;
+  }
+
   formatWithCommas(value: any): string {
     if (value == null || value === '') return '';
     const num = parseInt(value.toString().replace(/,/g, ''), 10);
     return isNaN(num) ? '' : num.toLocaleString('en-US');
   }
 
-  // Update FormControl on formatted input
   updateFormattedNumber(controlName: string, event: Event): void {
     const target = event.target as HTMLInputElement;
     const rawValue = target.value.replace(/,/g, '');
     const numericValue = parseInt(rawValue, 10);
     const control = this.orderForm.get(controlName);
 
-    if (!isNaN(numericValue)) {
-      control?.setValue(numericValue);
-    } else {
-      control?.setValue(null);
-    }
+    if (control) {
+      if (!isNaN(numericValue)) {
+        control.setValue(numericValue, { emitEvent: false });
 
-    control?.markAsTouched();
-    target.value = this.formatWithCommas(control?.value);
+        const errors = { ...control.errors };
+
+        if (numericValue < 1) {
+          errors['min'] = true;
+        } else {
+          delete errors['min'];
+        }
+
+        control.setErrors(Object.keys(errors).length ? errors : null);
+        control.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      } else {
+        control.setValue(null, { emitEvent: false });
+        control.setErrors({ required: true });
+        control.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      }
+
+      control.markAsTouched();
+      target.value = this.formatWithCommas(control.value);
+    }
   }
 
   onFileSelected(event: Event): void {

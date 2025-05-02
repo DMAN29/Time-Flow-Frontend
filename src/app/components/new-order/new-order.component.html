@@ -166,6 +166,9 @@
         <mat-error *ngIf="f['line'].hasError('required') && f['line'].touched">
           Line number is required.
         </mat-error>
+        <mat-error *ngIf="f['line'].hasError('min') && f['line'].touched">
+          Minimum line number is 1.
+        </mat-error>
       </mat-form-field>
     </div>
 
