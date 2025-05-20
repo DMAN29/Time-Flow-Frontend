@@ -128,6 +128,8 @@ export class StopWatchComponent implements OnInit {
   }
 
   onSubmitLaps(): void {
+    this.isSubmitting = true; // Start spinner and disable button
+
     const payload = {
       styleNo: this.styleNo,
       operatorName: this.operatorName,
@@ -135,21 +137,26 @@ export class StopWatchComponent implements OnInit {
       operationName: this.operationName,
       section: this.section,
       machineType: this.machineType,
-      lapsMS: this.getLapDifferences(), // ✅ send difference laps
+      lapsMS: this.getLapDifferences(),
     };
 
     if (this.id) {
       (payload as any).id = this.id;
       console.log('payload (update)', payload);
+
       this.timeStudyService.updateLapsReading(this.id, payload).subscribe({
         next: (res) => {
           console.log('✅ Study updated:', res);
           this.router.navigate(['/time-study', this.styleNo]);
         },
-        error: (err) => console.error('❌ Failed to update study', err),
+        error: (err) => {
+          console.error('❌ Failed to update study', err);
+          this.isSubmitting = false; // Reset on error
+        },
       });
     } else {
       console.log('payload (new)', payload);
+
       this.timeStudyService.storeStudy(payload).subscribe({
         next: (res) => {
           console.log('✅ Study saved:', res);
@@ -157,6 +164,7 @@ export class StopWatchComponent implements OnInit {
         },
         error: (err) => {
           console.error('❌ Failed to save study', err);
+          this.isSubmitting = false; // Reset on error
         },
       });
     }

@@ -77,16 +77,31 @@
       color="primary"
       (click)="onSubmitLaps()"
       [disabled]="isSubmitting"
+      style="
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 160px;
+        justify-content: center;
+      "
     >
-      <mat-icon class="mr-1" *ngIf="!isSubmitting">send</mat-icon>
-      <mat-progress-spinner
-        *ngIf="isSubmitting"
-        diameter="20"
-        mode="indeterminate"
-        color="accent"
-        class="mr-2"
-      ></mat-progress-spinner>
-      {{ isSubmitting ? "Submitting..." : "Submit" }}
+      <ng-container *ngIf="!isSubmitting">
+        <mat-icon>send</mat-icon>
+        <span>Submit</span>
+      </ng-container>
+
+      <ng-container *ngIf="isSubmitting">
+        <span style="display: inline-flex; align-items: center; gap: 8px">
+          <mat-progress-spinner
+            diameter="16"
+            mode="indeterminate"
+            color="accent"
+            [strokeWidth]="3"
+            style="width: 16px; height: 16px"
+          ></mat-progress-spinner>
+          Submitting...
+        </span>
+      </ng-container>
     </button>
 
     <button mat-stroked-button color="warn" (click)="reset()">
