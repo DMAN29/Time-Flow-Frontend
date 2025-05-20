@@ -80,9 +80,9 @@ export class OrderService {
   }
 
   deleteOrder(styleNo: string): Observable<ApiResponse> {
-    // const token = localStorage.getItem('token') || '';
+    const encodedStyleNo = encodeURIComponent(styleNo);
     return this.http.delete<ApiResponse>(
-      `${this.URL}/delete/${styleNo}`,
+      `${this.URL}/delete/${encodedStyleNo}`,
       getAuthHeaders()
     );
   }
