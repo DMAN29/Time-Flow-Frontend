@@ -5,11 +5,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TimeStudyService } from '../../service/time-study.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-stop-watch',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatProgressSpinner,
+  ],
   templateUrl: './stop-watch.component.html',
   styleUrls: ['./stop-watch.component.css'],
 })
@@ -28,6 +35,7 @@ export class StopWatchComponent implements OnInit {
   intervalId: any;
   laps: number[] = [];
   id!: string | null;
+  isSubmitting: boolean = false;
 
   constructor(
     private route: ActivatedRoute,

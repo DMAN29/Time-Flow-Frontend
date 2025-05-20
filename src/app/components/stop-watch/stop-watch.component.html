@@ -72,9 +72,21 @@
 
   <!-- Submit and Final Reset -->
   <div *ngIf="showSubmitSection" class="mt-6 flex justify-center gap-4">
-    <button mat-raised-button color="primary" (click)="onSubmitLaps()">
-      <mat-icon class="mr-1">send</mat-icon>
-      Submit
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmitLaps()"
+      [disabled]="isSubmitting"
+    >
+      <mat-icon class="mr-1" *ngIf="!isSubmitting">send</mat-icon>
+      <mat-progress-spinner
+        *ngIf="isSubmitting"
+        diameter="20"
+        mode="indeterminate"
+        color="accent"
+        class="mr-2"
+      ></mat-progress-spinner>
+      {{ isSubmitting ? "Submitting..." : "Submit" }}
     </button>
 
     <button mat-stroked-button color="warn" (click)="reset()">
